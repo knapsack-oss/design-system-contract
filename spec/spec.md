@@ -252,7 +252,7 @@ integrity-checked from the manifest alone
 - This document validates:
   ```json
   {
-    "$schema": "https://knapsack-labs.github.io/design-system-contract/schemas/v0/manifest.schema.json",
+    "$schema": "https://knapsack-oss.github.io/design-system-contract/schemas/v0/manifest.schema.json",
     "contractVersion": "3.2.0",
     "artifacts": [
       { "path": "components/button-primary.contract.json",

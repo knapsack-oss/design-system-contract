@@ -17,7 +17,7 @@ Licensed [Apache-2.0](LICENSE).
 
 ```json
 {
-  "$schema": "https://knapsack-labs.github.io/design-system-contract/schemas/v0/component.contract.schema.json",
+  "$schema": "https://knapsack-oss.github.io/design-system-contract/schemas/v0/component.contract.schema.json",
   "contractId": "button-primary",
   "component": "Button Primary",
   "description": "The primary call-to-action button.",
@@ -74,12 +74,12 @@ Nothing is silently merged. The rule gives the same answer on every machine, in 
 
 ```json
 {
-  "$schema": "https://knapsack-labs.github.io/design-system-contract/schemas/v0/manifest.schema.json",
+  "$schema": "https://knapsack-oss.github.io/design-system-contract/schemas/v0/manifest.schema.json",
   "contractVersion": "0.1.0",
   "artifacts": [
     {
       "path": "button-primary.contract.json",
-      "address": "sha256:9a6ccffc92b47ab68c32e5c90aa85c5abaefb5ad89b604ebd9affd2b1f9315a4",
+      "address": "sha256:b11ac43d1cf8120534e96ec2d90c24a4c2d9b20364fe01e27632ee7ad63b7dd4",
       "origin": "synced"
     }
   ]
