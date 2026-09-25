@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://knapsack-labs.github.io/design-system-contract/schemas/v0/component.contract.schema.json",
+  "$id": "https://knapsack-oss.github.io/design-system-contract/schemas/v0/component.contract.schema.json",
   "title": "Design System Contract: component contract",
   "description": "One JSON document describing the governed interface of exactly one component: identity, display name, typed props, slots, and states. Licensed Apache-2.0.",
   "type": "object",
