@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://knapsack-labs.github.io/design-system-contract/schemas/v0/manifest.schema.json",
+  "title": "Design System Contract: manifest",
+  "description": "Lists the component contracts a design system publishes, with each contract's location, content address, and origin. Licensed Apache-2.0.",
+  "type": "object",
+  "required": ["contractVersion", "artifacts"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "description": "Optional pointer to this schema.",
+      "type": "string",
+      "minLength": 1
+    },
+    "contractVersion": {
+      "description": "Version of the published contract set this manifest describes.",
+      "type": "string",
+      "minLength": 1
+    },
+    "artifacts": {
+      "description": "One record per component contract. The manifest never lists itself. Every contractId among the listed contracts must be unique; the schema cannot check this, so a publisher checks it at publish.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/artifactRecord" }
+    }
+  },
+  "$defs": {
+    "artifactRecord": {
+      "type": "object",
+      "required": ["path", "address", "origin"],
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "description": "Location of the contract file, relative to the manifest's own directory.",
+          "type": "string",
+          "minLength": 1
+        },
+        "address": {
+          "description": "sha256: plus the lowercase hex SHA-256 digest of the contract's canonical form (RFC 8785, JSON Canonicalization Scheme, as UTF-8). A mismatch makes the artifact invalid.",
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "origin": {
+          "description": "inferred: derived without owner confirmation. synced: retrieved from the design system's source of truth.",
+          "enum": ["inferred", "synced"]
+        }
+      }
+    }
+  }
+}

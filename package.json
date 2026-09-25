@@ -1,0 +1,14 @@
+{
+  "name": "design-system-contract",
+  "private": true,
+  "description": "Checks the Design System Contract schemas and examples. Not a published package.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  },
+  "devDependencies": {
+    "ajv": "^8.17.1",
+    "canonicalize": "^5.0.0"
+  }
+}

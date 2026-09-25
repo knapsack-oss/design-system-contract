@@ -1,0 +1,20 @@
+{
+  "$schema": "https://knapsack-labs.github.io/design-system-contract/schemas/v0/component.contract.schema.json",
+  "contractId": "button-primary",
+  "component": "Button Primary",
+  "description": "The primary call-to-action button.",
+  "props": {
+    "properties": {
+      "label": { "type": "string", "description": "Visible text" },
+      "variant": { "type": "string", "enum": ["primary", "secondary"], "default": "primary" },
+      "disabled": { "type": "boolean", "default": false }
+    },
+    "required": ["label"],
+    "additionalProperties": false
+  },
+  "slots": [
+    "icon",
+    { "name": "body", "a11y": { "nameFrom": "content", "required": true } }
+  ],
+  "states": ["hover", "disabled"]
+}
