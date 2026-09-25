@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://knapsack-labs.github.io/design-system-contract/schemas/v0/manifest.schema.json",
+  "$id": "https://knapsack-oss.github.io/design-system-contract/schemas/v0/manifest.schema.json",
   "title": "Design System Contract: manifest",
   "description": "Lists the component contracts a design system publishes, with each contract's location, content address, and origin. Licensed Apache-2.0.",
   "type": "object",
