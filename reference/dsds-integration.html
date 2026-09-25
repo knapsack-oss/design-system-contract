@@ -140,7 +140,7 @@
   <p>This page lists trait properties by DSDS's own names. It does not restate the JSON shape of a DSDS <code>traits</code> entry; that shape belongs to DSDS.</p>
 
   <h2 id="unaddressed">Cases the mapping table does not address</h2>
-  <p>The v0.1 mapping table does not state an outcome for these inputs. <mark class="verify">[VERIFY]</mark> each against the specification's intent.</p>
+  <p>The v0.1 mapping table doesn't state an outcome for these inputs. They're listed in the <a href="https://github.com/knapsack-labs/design-system-contract#known-limitations">known limitations</a> and will be settled in a later version.</p>
   <ul>
     <li>A prop and a state with the same name. The example contract <a href="../examples/button-primary.contract.json"><code>button-primary.contract.json</code></a> declares both a <code>disabled</code> prop and a <code>disabled</code> state, which would project to two traits named <code>disabled</code>.</li>
     <li>A prop with <code>type: "boolean"</code> that also carries <code>enum</code>, which matches both the enum row and the boolean row.</li>
