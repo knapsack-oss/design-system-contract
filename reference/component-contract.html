@@ -34,7 +34,7 @@
     <tbody>
       <tr><th scope="row">Schema file</th><td><a href="../schemas/v0/component.contract.schema.json"><code>schemas/v0/component.contract.schema.json</code></a></td></tr>
       <tr><th scope="row">Dialect</th><td><code>https://json-schema.org/draft/2020-12/schema</code></td></tr>
-      <tr><th scope="row"><code>$id</code></th><td><code>https://knapsack-labs.github.io/design-system-contract/schemas/v0/component.contract.schema.json</code> (identifier only, not a network location; see <a href="scope.html#schema-ids">schema identifiers</a>)</td></tr>
+      <tr><th scope="row"><code>$id</code></th><td><code>https://knapsack-oss.github.io/design-system-contract/schemas/v0/component.contract.schema.json</code> (identifier only, not a network location; see <a href="scope.html#schema-ids">schema identifiers</a>)</td></tr>
       <tr><th scope="row">Root type</th><td><code>object</code></td></tr>
       <tr><th scope="row">Required</th><td><code>contractId</code>, <code>component</code></td></tr>
       <tr><th scope="row">Additional members</th><td>Not permitted (<code>additionalProperties: false</code>)</td></tr>
@@ -77,7 +77,7 @@
       <dt>Default</dt><dd>None</dd>
     </dl>
     <p>Optional pointer to this schema. The URL is the schema's <code>$id</code> and is served from this site.</p>
-    <pre><code class="language-json">"$schema": "https://knapsack-labs.github.io/design-system-contract/schemas/v0/component.contract.schema.json"</code></pre>
+    <pre><code class="language-json">"$schema": "https://knapsack-oss.github.io/design-system-contract/schemas/v0/component.contract.schema.json"</code></pre>
     <p class="related">Related: <a href="scope.html#schema-ids">Schema identifiers</a></p>
   </section>
 
@@ -417,7 +417,7 @@
       <tbody>
         <tr id="a11y-role"><td><code>role</code></td><td>string</td><td>No</td><td><code>minLength: 1</code></td></tr>
         <tr id="a11y-namefrom"><td><code>nameFrom</code></td><td>string</td><td>No</td><td><code>minLength: 1</code></td></tr>
-        <tr id="a11y-required"><td><code>required</code></td><td>boolean</td><td>No</td><td>Not defined in v0.1. The schema declares it but the specification doesn't yet say what it requires. See <a href="https://github.com/knapsack-labs/design-system-contract#known-limitations">known limitations</a>.</td></tr>
+        <tr id="a11y-required"><td><code>required</code></td><td>boolean</td><td>No</td><td>Not defined in v0.1. The schema declares it but the specification doesn't yet say what it requires. See <a href="https://github.com/knapsack-oss/design-system-contract#known-limitations">known limitations</a>.</td></tr>
       </tbody>
     </table>
     </div>
@@ -457,7 +457,7 @@
   <h2 id="full-example">Complete example</h2>
   <p>Source: <a href="../examples/button-primary.contract.json"><code>examples/button-primary.contract.json</code></a></p>
   <pre><code class="language-json">{
-  "$schema": "https://knapsack-labs.github.io/design-system-contract/schemas/v0/component.contract.schema.json",
+  "$schema": "https://knapsack-oss.github.io/design-system-contract/schemas/v0/component.contract.schema.json",
   "contractId": "button-primary",
   "component": "Button Primary",
   "description": "The primary call-to-action button.",

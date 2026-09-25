@@ -34,7 +34,7 @@
     <tbody>
       <tr><th scope="row">Schema file</th><td><a href="../schemas/v0/manifest.schema.json"><code>schemas/v0/manifest.schema.json</code></a></td></tr>
       <tr><th scope="row">Dialect</th><td><code>https://json-schema.org/draft/2020-12/schema</code></td></tr>
-      <tr><th scope="row"><code>$id</code></th><td><code>https://knapsack-labs.github.io/design-system-contract/schemas/v0/manifest.schema.json</code> (identifier only, not a network location; see <a href="scope.html#schema-ids">schema identifiers</a>)</td></tr>
+      <tr><th scope="row"><code>$id</code></th><td><code>https://knapsack-oss.github.io/design-system-contract/schemas/v0/manifest.schema.json</code> (identifier only, not a network location; see <a href="scope.html#schema-ids">schema identifiers</a>)</td></tr>
       <tr><th scope="row">Root type</th><td><code>object</code></td></tr>
       <tr><th scope="row">Required</th><td><code>contractVersion</code>, <code>artifacts</code></td></tr>
       <tr><th scope="row">Additional members</th><td>Not permitted (<code>additionalProperties: false</code>)</td></tr>
@@ -71,7 +71,7 @@
       <dt>Default</dt><dd>None</dd>
     </dl>
     <p>Optional pointer to this schema. The URL is the schema's <code>$id</code> and is served from this site.</p>
-    <pre><code class="language-json">"$schema": "https://knapsack-labs.github.io/design-system-contract/schemas/v0/manifest.schema.json"</code></pre>
+    <pre><code class="language-json">"$schema": "https://knapsack-oss.github.io/design-system-contract/schemas/v0/manifest.schema.json"</code></pre>
     <p class="related">Related: <a href="scope.html#schema-ids">Schema identifiers</a></p>
   </section>
 
@@ -104,7 +104,7 @@
     <pre><code class="language-json">"artifacts": [
   {
     "path": "button-primary.contract.json",
-    "address": "sha256:9a6ccffc92b47ab68c32e5c90aa85c5abaefb5ad89b604ebd9affd2b1f9315a4",
+    "address": "sha256:b11ac43d1cf8120534e96ec2d90c24a4c2d9b20364fe01e27632ee7ad63b7dd4",
     "origin": "synced"
   }
 ]</code></pre>
@@ -138,7 +138,7 @@
     <p>Describes one component contract file. v0.1 defines no per-record <code>ratified</code>, <code>signature</code>, or <code>canonicalForm</code> member; each fails validation.</p>
     <pre><code class="language-json">{
   "path": "button-primary.contract.json",
-  "address": "sha256:9a6ccffc92b47ab68c32e5c90aa85c5abaefb5ad89b604ebd9affd2b1f9315a4",
+  "address": "sha256:b11ac43d1cf8120534e96ec2d90c24a4c2d9b20364fe01e27632ee7ad63b7dd4",
   "origin": "synced"
 }</code></pre>
   </section>
@@ -168,11 +168,11 @@
     </dl>
     <p><code>sha256:</code> plus the lowercase hex SHA-256 (Secure Hash Algorithm, 256-bit) digest of the contract's canonical form (RFC 8785, Request for Comments 8785, the JSON Canonicalization Scheme, as UTF-8). A mismatch makes the artifact invalid. The schema checks the format only; it does not recompute the digest.</p>
     <span class="code-label">Valid</span>
-    <pre><code class="language-json">"address": "sha256:9a6ccffc92b47ab68c32e5c90aa85c5abaefb5ad89b604ebd9affd2b1f9315a4"</code></pre>
+    <pre><code class="language-json">"address": "sha256:b11ac43d1cf8120534e96ec2d90c24a4c2d9b20364fe01e27632ee7ad63b7dd4"</code></pre>
     <span class="code-label">Invalid</span>
     <pre><code class="language-jsonc">"address": "sha256:E67003F8B545A3B081EAE58B5F392AC0BF9FF33619B5E6F826DAF7D8BC272434"  // uppercase hex
-"address": "9a6ccffc92b47ab68c32e5c90aa85c5abaefb5ad89b604ebd9affd2b1f9315a4"         // no prefix
-"address": "sha512:9a6ccffc92b47ab68c32e5c90aa85c5abaefb5ad89b604ebd9affd2b1f9315a4"  // other algorithm</code></pre>
+"address": "b11ac43d1cf8120534e96ec2d90c24a4c2d9b20364fe01e27632ee7ad63b7dd4"         // no prefix
+"address": "sha512:b11ac43d1cf8120534e96ec2d90c24a4c2d9b20364fe01e27632ee7ad63b7dd4"  // other algorithm</code></pre>
     <p class="related">Related: <a href="content-addressing.html">Content addressing</a>, <a href="content-addressing.html#mismatch">Mismatch handling</a></p>
   </section>
 
@@ -216,12 +216,12 @@
   <h2 id="full-example">Complete example</h2>
   <p>Source: <a href="../examples/manifest.json"><code>examples/manifest.json</code></a>. The listed contract is <a href="../examples/button-primary.contract.json"><code>examples/button-primary.contract.json</code></a>, in the same directory.</p>
   <pre><code class="language-json">{
-  "$schema": "https://knapsack-labs.github.io/design-system-contract/schemas/v0/manifest.schema.json",
+  "$schema": "https://knapsack-oss.github.io/design-system-contract/schemas/v0/manifest.schema.json",
   "contractVersion": "0.1.0",
   "artifacts": [
     {
       "path": "button-primary.contract.json",
-      "address": "sha256:9a6ccffc92b47ab68c32e5c90aa85c5abaefb5ad89b604ebd9affd2b1f9315a4",
+      "address": "sha256:b11ac43d1cf8120534e96ec2d90c24a4c2d9b20364fe01e27632ee7ad63b7dd4",
       "origin": "synced"
     }
   ]

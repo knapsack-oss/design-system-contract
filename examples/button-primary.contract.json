@@ -1,5 +1,5 @@
 {
-  "$schema": "https://knapsack-labs.github.io/design-system-contract/schemas/v0/component.contract.schema.json",
+  "$schema": "https://knapsack-oss.github.io/design-system-contract/schemas/v0/component.contract.schema.json",
   "contractId": "button-primary",
   "component": "Button Primary",
   "description": "The primary call-to-action button.",
