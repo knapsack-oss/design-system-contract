@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<!--
+  DRAFT for human review. Not reviewed for publication.
+  type: reference
+  audience: developers implementing tools that read, write, or validate Design System Contract files
+  source: v0.1 schemas, spec 0.11.0, README
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Design System Contract v0.1 reference</title>
+  <meta name="description" content="Field-level reference for the Design System Contract v0.1 component contract and manifest JSON formats.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<header class="site-header">
+  <a class="brand" href="index.html" aria-label="Knapsack, Design System Contract reference home"><svg class="logo" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="491" height="96" fill="none" viewBox="0 0 491 96"><path fill="#0c092d" d="M450.1 0q1.6.1 1.8 1.8v33.6q0 .8-.4 1.2l-4.3 4.9c-1 1.2-1.1 3-.2 4.4l4.6 6.5q.3.5.3 1v22q-.2 1.7-1.8 1.9H438q-1.7-.1-1.8-1.8V1.8Q436.3.2 438 0z"/><path fill="#0c092d" d="M486.3 18.8c1.5 0 2.3 1.7 1.3 2.9l-18 20.8q-.8 1.2-.1 2.2l21 29.8c.8 1.1 0 2.8-1.5 2.8h-14q-.8 0-1.4-.8l-21.4-30.6c-1-1.4-.9-3.2.2-4.4l19.2-22.1q.5-.6 1.3-.6zM402 78.6a33 33 0 0 1-14.9-3.3q-6.6-3.3-10.5-10a34 34 0 0 1-3.7-16.7v-2.2q0-9.5 4-15.8 4-6.5 10.6-9.9 6.7-3.3 14.6-3.3 8.5 0 14.4 3 6 2.7 9 7.7 2.7 4.2 3.5 9.2 0 1.7-1.7 1.9h-12.8a2 2 0 0 1-1.9-1.4 10 10 0 0 0-3-4.8q-2.5-2.3-7.5-2.3-3.6 0-6.6 1.6t-4.8 5.2a19 19 0 0 0-1.8 8.9v2.2q0 5.8 1.7 9.6 1.7 3.6 4.7 5.4a13 13 0 0 0 6.8 1.7q4.2 0 7-2 2.4-2 3.5-5.1a2 2 0 0 1 1.8-1.4h12.9c1 0 1.8 1 1.7 2q-1 5.4-4 9.6a23 23 0 0 1-9.4 7.6 34 34 0 0 1-13.5 2.6m-70.4 0q-6.3 0-10.7-2.3-4.4-2.5-6.8-6.7t-2.3-9.5q0-8.7 5.2-13.2t16-4.5h17v-2.7q0-5.5-2.5-7.6Q345 30 340 30q-4.6 0-6.7 1.6-1.5.9-2 2.4t-2 1.6h-12.2q-1.7-.1-1.7-1.8a17 17 0 0 1 3.1-7.3q3-4.2 8.5-6.5a34 34 0 0 1 13.5-2.5q7.8 0 13.4 2.4 5.7 2.2 9 7.2 3 5 3.1 13.4v22l.6 12.8q-.1 1.8-1.8 2h-11.4q-1.4 0-1.7-1.5l-.4-5.6q-2.4 3.5-7.3 6a27 27 0 0 1-12.3 2.5m5-11.6a17 17 0 0 0 6.7-1.3q3-1.4 4.8-4a11 11 0 0 0 2-6.5v-2.7H336q-3.9 0-6 2a7 7 0 0 0-2.2 5q0 3.3 2.1 5.4 2.3 2 6.6 2m-57.3 11.6q-7.2 0-12.1-1.5a25 25 0 0 1-8.2-4 17 17 0 0 1-6.4-11.3q-.1-1.7 1.7-1.9h12.4q1.3.1 1.8 1.3a8 8 0 0 0 2.8 3.1q2.6 1.8 8 1.8 6 0 8.7-1.6 2.6-1.8 2.6-4.2 0-1.6-1.1-2.8a9 9 0 0 0-4-2.1 57 57 0 0 0-8.5-1.9q-4.8-.7-9-1.9t-7.4-3.3q-3.1-2-4.9-5.3a17 17 0 0 1 1.3-16.7q3-4.2 8.7-6.4 5.8-2.5 13.6-2.5 9 0 14.2 2.8 5.1 2.6 7.7 7 2 3.3 2.8 7 .1 1.7-1.7 1.9h-12.5q-1.2-.1-1.9-1.3a7 7 0 0 0-2.7-3.2 10 10 0 0 0-5.9-1.7q-5.1 0-7.4 1.7-2.1 1.5-2.2 3.8 0 2.6 2.9 3.9t10.3 2.3q4.8.6 9 2t7.5 3.3q3.4 2.1 5.2 5.3 2 3.2 2 7.8 0 5.4-3.2 9.6-3 4.2-9 6.7-6 2.3-15 2.3M190.7 96q-1.6-.1-1.7-1.8V20.5q.2-1.6 1.7-1.7H202q1.7.2 1.8 1.7V27q2.1-3.7 6.8-6.6 4.6-3 11.7-3 12 0 18.5 7.3t6.5 21.7v2.2q0 9.9-3.1 16.6a22 22 0 0 1-21.9 13.4q-5.5 0-10-2.3-4.5-2.5-7.4-6.8v24.7q-.2 1.7-1.8 1.8zm27.8-30.6q5.3 0 8.9-4.1 3.6-4.4 3.6-12.7v-2.2q0-8-3.5-11.9t-9-4q-4 0-7 1.6a12 12 0 0 0-5 4.7q-1.7 3-1.7 7.6v6.1q0 4.9 1.7 8.3 1.8 3.3 4.9 5 3 1.5 7 1.6m-73.1 13.2q-6.3 0-10.7-2.3-4.5-2.5-6.7-6.7-2.4-4.2-2.4-9.5 0-8.7 5.2-13.2 5.4-4.5 16-4.5h17v-2.7q0-5.5-2.5-7.6-2.5-2.2-7.6-2.2-4.5 0-6.6 1.6-1.4.9-2 2.4-.5 1.5-2 1.6h-12.3q-1.7-.1-1.6-1.8a17 17 0 0 1 3-7.3q3-4.2 8.6-6.5a34 34 0 0 1 13.4-2.5q7.8 0 13.4 2.4 5.7 2.2 9 7.2t3.2 13.4v22l.5 12.8q0 1.8-1.8 2h-11.3q-1.6 0-1.8-1.5l-.3-5.6q-2.4 3.5-7.3 6a27 27 0 0 1-12.4 2.5m5-11.6a17 17 0 0 0 6.7-1.3q3-1.4 4.9-4a11 11 0 0 0 1.9-6.5v-2.7h-14q-4 0-6.1 2a7 7 0 0 0-2.1 5q0 3.3 2 5.4 2.2 2 6.7 2M64.5 77.3q-1.6-.2-1.8-1.8v-55q.1-1.6 1.8-1.7h11q1.6.2 1.8 1.7V27q2.3-4 6.9-6.7 4.6-3 12.6-2.9 10.5 0 15.9 5.8 5.3 5.6 5.3 16.3v36q-.1 1.6-1.8 1.8H104q-1.6-.2-1.8-1.8V43q0-6.1-2.7-9.2-2.5-3-8.6-3.1a13 13 0 0 0-7 1.7 10 10 0 0 0-4.1 4.6q-1.3 2.7-1.3 6v32.5q-.2 1.6-1.7 1.8zM15.2 0Q17 .2 17 1.8v33.6q0 .8-.4 1.2l-4.3 4.9c-1 1.2-1.1 3-.2 4.4l4.6 6.5q.3.5.3 1v22q-.1 1.7-1.8 1.9H3q-1.6-.2-1.8-1.8V1.8Q1.3.2 3 0z"/><path fill="#0c092d" d="M51.3 18.8c1.6 0 2.4 1.7 1.4 2.9l-18 20.8q-.8 1.2-.1 2.2l21 29.8c.8 1.1 0 2.8-1.5 2.8h-14q-1 0-1.4-.8L17.3 45.9c-1-1.4-.9-3.2.2-4.4l19.2-22.1q.5-.6 1.3-.6z"/></svg></a>
+  <a class="site-title" href="index.html">Design System Contract</a>
+  <span class="badge">format v0.1 · spec 0.11.0</span>
+  <a class="header-jump" href="#site-nav">Reference topics</a>
+</header>
+
+<div class="layout">
+<main id="content">
+  <h1>Design System Contract reference</h1>
+  <p class="lede">A design system's rules usually live where code tools can't read them: a docs site, a Figma library, a component package's source. So an AI coding agent guesses. It invents variant names, fills in props, and builds lookalike components.</p>
+  <p>The Design System Contract writes those rules down as data. One JSON file per component says which props exist, what type each one is, which values are legal, and what the defaults are. A manifest lists those files and records a content address for each one. Both formats have JSON Schema 2020-12 schemas, so any stock validator can check them.</p>
+  <p>A design system isn't documentation to consult. It's a contract to check against. These pages are the lookup: every member, every rule, every constraint.</p>
+  <p><span class="badge">format v0.1</span> <span class="badge">spec 0.11.0</span></p>
+
+  <h2 id="topics">Reference topics</h2>
+  <ul class="topic-grid">
+    <li><a href="reference/component-contract.html"><span class="topic-name">Component contract</span><span class="topic-desc">Every member of the component contract: <code>contractId</code>, <code>component</code>, <code>props</code>, <code>slots</code>, and <code>states</code>.</span></a></li>
+    <li><a href="reference/manifest.html"><span class="topic-name">Manifest</span><span class="topic-desc"><code>contractVersion</code>, <code>artifacts</code>, and the artifact record: <code>path</code>, <code>address</code>, and <code>origin</code>.</span></a></li>
+    <li><a href="reference/contract-id.html"><span class="topic-name">contractId and the fold</span><span class="topic-desc">The five fold steps, rejection reasons, collision scope, and worked examples.</span></a></li>
+    <li><a href="reference/content-addressing.html"><span class="topic-name">Content addressing</span><span class="topic-desc">The <code>sha256:</code> address format, RFC 8785 canonical form, and mismatch handling.</span></a></li>
+    <li><a href="reference/dsds-integration.html"><span class="topic-name">DSDS integration</span><span class="topic-desc">The DSDS <code>specs</code> pointer and the mapping from props and states to DSDS traits.</span></a></li>
+    <li><a href="reference/scope.html"><span class="topic-name">Scope and limits</span><span class="topic-desc">What v0.1 does not cover, what schema validation does not check, and permissive schema behavior.</span></a></li>
+  </ul>
+
+  <h2 id="files">Schemas and examples</h2>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>File</th><th>Contents</th></tr></thead>
+    <tbody>
+      <tr><td><a href="schemas/v0/component.contract.schema.json"><code>schemas/v0/component.contract.schema.json</code></a></td><td>JSON Schema 2020-12 for the component contract</td></tr>
+      <tr><td><a href="schemas/v0/manifest.schema.json"><code>schemas/v0/manifest.schema.json</code></a></td><td>JSON Schema 2020-12 for the manifest</td></tr>
+      <tr><td><a href="examples/button-primary.contract.json"><code>examples/button-primary.contract.json</code></a></td><td>A valid component contract</td></tr>
+      <tr><td><a href="examples/manifest.json"><code>examples/manifest.json</code></a></td><td>A valid manifest listing the example contract</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>These reference pages render the schemas in readable form. Where prose and a schema disagree, the schema is correct.</p>
+  <div class="callout">
+    <span class="callout-title">Schema identifiers resolve to this site</span>
+    <p>The schema <code>$id</code> values under <code>https://knapsack-labs.github.io/design-system-contract/schemas/v0/</code> are served from this site, so a validator can fetch them by <code>$schema</code>. See <a href="reference/scope.html#schema-ids">schema identifiers</a>.</p>
+  </div>
+
+  <h2 id="at-a-glance">At a glance</h2>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>Item</th><th>Value</th></tr></thead>
+    <tbody>
+      <tr><td>Component contract required members</td><td><a href="reference/component-contract.html#contractid"><code>contractId</code></a>, <a href="reference/component-contract.html#component"><code>component</code></a></td></tr>
+      <tr><td>Manifest required members</td><td><a href="reference/manifest.html#contractversion"><code>contractVersion</code></a>, <a href="reference/manifest.html#artifacts"><code>artifacts</code></a></td></tr>
+      <tr><td><code>contractId</code> pattern</td><td><code>^[a-z0-9]+(-[a-z0-9]+)*$</code></td></tr>
+      <tr><td>Address pattern</td><td><code>^sha256:[0-9a-f]{64}$</code></td></tr>
+      <tr><td><code>origin</code> values</td><td><code>inferred</code>, <code>synced</code></td></tr>
+      <tr><td>Additional members</td><td>Not permitted on the contract root, <code>props</code>, a prop schema, a slot record, slot accessibility, the manifest root, or an artifact record. <code>props.properties</code> is a map whose keys are prop names.</td></tr>
+      <tr><td>License</td><td>Apache-2.0</td></tr>
+    </tbody>
+  </table>
+  </div>
+</main>
+
+<nav class="sidebar" id="site-nav" aria-label="Reference topics">
+  <h2>Reference</h2>
+  <ul>
+    <li><a href="index.html" aria-current="page">Overview</a></li>
+    <li><a href="reference/component-contract.html">Component contract</a></li>
+    <li><a href="reference/manifest.html">Manifest</a></li>
+    <li><a href="reference/contract-id.html">contractId and the fold</a></li>
+    <li><a href="reference/content-addressing.html">Content addressing</a></li>
+    <li><a href="reference/dsds-integration.html">DSDS integration</a></li>
+    <li><a href="reference/scope.html">Scope and limits</a></li>
+  </ul>
+</nav>
+</div>
+
+<footer class="site-footer">
+  Design System Contract, format v0.1, spec 0.11.0. Licensed Apache-2.0.
+</footer>
+</body>
+</html>

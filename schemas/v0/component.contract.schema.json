@@ -1,0 +1,137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://knapsack-labs.github.io/design-system-contract/schemas/v0/component.contract.schema.json",
+  "title": "Design System Contract: component contract",
+  "description": "One JSON document describing the governed interface of exactly one component: identity, display name, typed props, slots, and states. Licensed Apache-2.0.",
+  "type": "object",
+  "required": ["contractId", "component"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "description": "Optional pointer to this schema.",
+      "type": "string",
+      "minLength": 1
+    },
+    "contractId": {
+      "description": "The contract's normative identity: the fold of the component's declared name (see the specification, section \"The fold\"). Lowercase letters and digits in hyphen-separated segments. Not namespaced and not versioned. Also a valid DSDS component id.",
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+    },
+    "component": {
+      "description": "The design system's own display name for the component, carried verbatim. Never folded, and may differ from contractId.",
+      "type": "string",
+      "minLength": 1
+    },
+    "description": {
+      "description": "Human-readable summary of the component.",
+      "type": "string"
+    },
+    "cemRef": {
+      "description": "Custom Elements Manifest identifier for this component. Carried as an identifier only; the manifest entry's shape is not restated here.",
+      "type": "string",
+      "minLength": 1
+    },
+    "shadcnRef": {
+      "description": "shadcn registry item identifier for this component. Carried as an identifier only; the registry item's shape is not restated here.",
+      "type": "string",
+      "minLength": 1
+    },
+    "props": { "$ref": "#/$defs/props" },
+    "slots": {
+      "description": "Named insertion points the component exposes. Optional. How a publisher obtains slot names is not specified.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/slot" }
+    },
+    "states": {
+      "description": "Named conditions the component can be in. Optional. How a publisher obtains state names is not specified.",
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    }
+  },
+  "$defs": {
+    "props": {
+      "description": "The component's props, written as a JSON Schema 2020-12 object schema, so a stock validator can check a prop bag against it directly. Optional: a contract that omits props declares an empty, closed prop set. When props is present, additionalProperties is required and states whether undeclared props are allowed. An enum-typed prop is a variant axis; there is no separate variants member.",
+      "type": "object",
+      "required": ["additionalProperties"],
+      "additionalProperties": false,
+      "properties": {
+        "properties": {
+          "description": "Map from prop name to that prop's schema.",
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/prop" }
+        },
+        "required": {
+          "description": "Names of props a usage must supply. Every name must be a key of properties; the schema cannot check this, so a publisher checks it at publish.",
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "additionalProperties": {
+          "description": "false: a prop outside properties is undeclared (closed). true: any prop is permitted (open).",
+          "type": "boolean"
+        }
+      }
+    },
+    "prop": {
+      "description": "One prop's schema. type is required. If both enum and default are present, default must be one of the enum values; a publisher checks this at publish.",
+      "type": "object",
+      "required": ["type"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "description": "A JSON Schema 2020-12 type name, or an array of them.",
+          "oneOf": [
+            { "$ref": "#/$defs/typeName" },
+            {
+              "type": "array",
+              "items": { "$ref": "#/$defs/typeName" },
+              "minItems": 1,
+              "uniqueItems": true
+            }
+          ]
+        },
+        "default": {
+          "description": "The value used when a usage does not supply this prop. Any JSON value."
+        },
+        "description": {
+          "description": "Human-readable summary of the prop.",
+          "type": "string"
+        },
+        "enum": {
+          "description": "The allowed values. A prop carrying enum is a variant axis.",
+          "type": "array"
+        }
+      }
+    },
+    "typeName": {
+      "enum": ["string", "number", "integer", "boolean", "array", "object", "null"]
+    },
+    "slot": {
+      "description": "A slot, as a bare name or a record.",
+      "oneOf": [
+        { "type": "string", "minLength": 1 },
+        { "$ref": "#/$defs/slotRecord" }
+      ]
+    },
+    "slotRecord": {
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "description": { "type": "string" },
+        "a11y": { "$ref": "#/$defs/slotAccessibility" }
+      }
+    },
+    "slotAccessibility": {
+      "description": "Accessibility requirements for a slot. Role and naming vocabulary are ARIA's.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "role": { "type": "string", "minLength": 1 },
+        "nameFrom": { "type": "string", "minLength": 1 },
+        "required": { "type": "boolean" }
+      }
+    }
+  }
+}

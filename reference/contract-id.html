@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<!--
+  DRAFT for human review. Not reviewed for publication.
+  type: reference
+  audience: developers implementing tools that read, write, or validate Design System Contract files
+  source: spec 0.11.0, section "The fold (normative)", SR-130 to SR-133
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>contractId and the fold | Design System Contract</title>
+  <meta name="description" content="The fold algorithm that derives contractId from a declared name: steps, rejection reasons, collision scope, and worked examples.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header class="site-header">
+  <a class="brand" href="../index.html" aria-label="Knapsack, Design System Contract reference home"><svg class="logo" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="491" height="96" fill="none" viewBox="0 0 491 96"><path fill="#0c092d" d="M450.1 0q1.6.1 1.8 1.8v33.6q0 .8-.4 1.2l-4.3 4.9c-1 1.2-1.1 3-.2 4.4l4.6 6.5q.3.5.3 1v22q-.2 1.7-1.8 1.9H438q-1.7-.1-1.8-1.8V1.8Q436.3.2 438 0z"/><path fill="#0c092d" d="M486.3 18.8c1.5 0 2.3 1.7 1.3 2.9l-18 20.8q-.8 1.2-.1 2.2l21 29.8c.8 1.1 0 2.8-1.5 2.8h-14q-.8 0-1.4-.8l-21.4-30.6c-1-1.4-.9-3.2.2-4.4l19.2-22.1q.5-.6 1.3-.6zM402 78.6a33 33 0 0 1-14.9-3.3q-6.6-3.3-10.5-10a34 34 0 0 1-3.7-16.7v-2.2q0-9.5 4-15.8 4-6.5 10.6-9.9 6.7-3.3 14.6-3.3 8.5 0 14.4 3 6 2.7 9 7.7 2.7 4.2 3.5 9.2 0 1.7-1.7 1.9h-12.8a2 2 0 0 1-1.9-1.4 10 10 0 0 0-3-4.8q-2.5-2.3-7.5-2.3-3.6 0-6.6 1.6t-4.8 5.2a19 19 0 0 0-1.8 8.9v2.2q0 5.8 1.7 9.6 1.7 3.6 4.7 5.4a13 13 0 0 0 6.8 1.7q4.2 0 7-2 2.4-2 3.5-5.1a2 2 0 0 1 1.8-1.4h12.9c1 0 1.8 1 1.7 2q-1 5.4-4 9.6a23 23 0 0 1-9.4 7.6 34 34 0 0 1-13.5 2.6m-70.4 0q-6.3 0-10.7-2.3-4.4-2.5-6.8-6.7t-2.3-9.5q0-8.7 5.2-13.2t16-4.5h17v-2.7q0-5.5-2.5-7.6Q345 30 340 30q-4.6 0-6.7 1.6-1.5.9-2 2.4t-2 1.6h-12.2q-1.7-.1-1.7-1.8a17 17 0 0 1 3.1-7.3q3-4.2 8.5-6.5a34 34 0 0 1 13.5-2.5q7.8 0 13.4 2.4 5.7 2.2 9 7.2 3 5 3.1 13.4v22l.6 12.8q-.1 1.8-1.8 2h-11.4q-1.4 0-1.7-1.5l-.4-5.6q-2.4 3.5-7.3 6a27 27 0 0 1-12.3 2.5m5-11.6a17 17 0 0 0 6.7-1.3q3-1.4 4.8-4a11 11 0 0 0 2-6.5v-2.7H336q-3.9 0-6 2a7 7 0 0 0-2.2 5q0 3.3 2.1 5.4 2.3 2 6.6 2m-57.3 11.6q-7.2 0-12.1-1.5a25 25 0 0 1-8.2-4 17 17 0 0 1-6.4-11.3q-.1-1.7 1.7-1.9h12.4q1.3.1 1.8 1.3a8 8 0 0 0 2.8 3.1q2.6 1.8 8 1.8 6 0 8.7-1.6 2.6-1.8 2.6-4.2 0-1.6-1.1-2.8a9 9 0 0 0-4-2.1 57 57 0 0 0-8.5-1.9q-4.8-.7-9-1.9t-7.4-3.3q-3.1-2-4.9-5.3a17 17 0 0 1 1.3-16.7q3-4.2 8.7-6.4 5.8-2.5 13.6-2.5 9 0 14.2 2.8 5.1 2.6 7.7 7 2 3.3 2.8 7 .1 1.7-1.7 1.9h-12.5q-1.2-.1-1.9-1.3a7 7 0 0 0-2.7-3.2 10 10 0 0 0-5.9-1.7q-5.1 0-7.4 1.7-2.1 1.5-2.2 3.8 0 2.6 2.9 3.9t10.3 2.3q4.8.6 9 2t7.5 3.3q3.4 2.1 5.2 5.3 2 3.2 2 7.8 0 5.4-3.2 9.6-3 4.2-9 6.7-6 2.3-15 2.3M190.7 96q-1.6-.1-1.7-1.8V20.5q.2-1.6 1.7-1.7H202q1.7.2 1.8 1.7V27q2.1-3.7 6.8-6.6 4.6-3 11.7-3 12 0 18.5 7.3t6.5 21.7v2.2q0 9.9-3.1 16.6a22 22 0 0 1-21.9 13.4q-5.5 0-10-2.3-4.5-2.5-7.4-6.8v24.7q-.2 1.7-1.8 1.8zm27.8-30.6q5.3 0 8.9-4.1 3.6-4.4 3.6-12.7v-2.2q0-8-3.5-11.9t-9-4q-4 0-7 1.6a12 12 0 0 0-5 4.7q-1.7 3-1.7 7.6v6.1q0 4.9 1.7 8.3 1.8 3.3 4.9 5 3 1.5 7 1.6m-73.1 13.2q-6.3 0-10.7-2.3-4.5-2.5-6.7-6.7-2.4-4.2-2.4-9.5 0-8.7 5.2-13.2 5.4-4.5 16-4.5h17v-2.7q0-5.5-2.5-7.6-2.5-2.2-7.6-2.2-4.5 0-6.6 1.6-1.4.9-2 2.4-.5 1.5-2 1.6h-12.3q-1.7-.1-1.6-1.8a17 17 0 0 1 3-7.3q3-4.2 8.6-6.5a34 34 0 0 1 13.4-2.5q7.8 0 13.4 2.4 5.7 2.2 9 7.2t3.2 13.4v22l.5 12.8q0 1.8-1.8 2h-11.3q-1.6 0-1.8-1.5l-.3-5.6q-2.4 3.5-7.3 6a27 27 0 0 1-12.4 2.5m5-11.6a17 17 0 0 0 6.7-1.3q3-1.4 4.9-4a11 11 0 0 0 1.9-6.5v-2.7h-14q-4 0-6.1 2a7 7 0 0 0-2.1 5q0 3.3 2 5.4 2.2 2 6.7 2M64.5 77.3q-1.6-.2-1.8-1.8v-55q.1-1.6 1.8-1.7h11q1.6.2 1.8 1.7V27q2.3-4 6.9-6.7 4.6-3 12.6-2.9 10.5 0 15.9 5.8 5.3 5.6 5.3 16.3v36q-.1 1.6-1.8 1.8H104q-1.6-.2-1.8-1.8V43q0-6.1-2.7-9.2-2.5-3-8.6-3.1a13 13 0 0 0-7 1.7 10 10 0 0 0-4.1 4.6q-1.3 2.7-1.3 6v32.5q-.2 1.6-1.7 1.8zM15.2 0Q17 .2 17 1.8v33.6q0 .8-.4 1.2l-4.3 4.9c-1 1.2-1.1 3-.2 4.4l4.6 6.5q.3.5.3 1v22q-.1 1.7-1.8 1.9H3q-1.6-.2-1.8-1.8V1.8Q1.3.2 3 0z"/><path fill="#0c092d" d="M51.3 18.8c1.6 0 2.4 1.7 1.4 2.9l-18 20.8q-.8 1.2-.1 2.2l21 29.8c.8 1.1 0 2.8-1.5 2.8h-14q-1 0-1.4-.8L17.3 45.9c-1-1.4-.9-3.2.2-4.4l19.2-22.1q.5-.6 1.3-.6z"/></svg></a>
+  <a class="site-title" href="../index.html">Design System Contract</a>
+  <span class="badge">format v0.1 · spec 0.11.0</span>
+  <a class="header-jump" href="#site-nav">Reference topics</a>
+</header>
+
+<div class="layout">
+<main id="content">
+  <h1>contractId and the fold</h1>
+  <p class="lede">The fold turns a declared name, the name a publisher's source gives the component, into its <code>contractId</code>. Same input, same output, on every machine and in every locale. No guessing. No transliteration. No silent merges.</p>
+
+  <div class="table-wrap">
+  <table>
+    <tbody>
+      <tr><th scope="row">Input</th><td>The declared name, as a sequence of Unicode code points</td></tr>
+      <tr><th scope="row">Output</th><td>An identifier matching <code>^[a-z0-9]+(-[a-z0-9]+)*$</code>, or a rejection</td></tr>
+      <tr><th scope="row">Applied by</th><td>Publisher, at publish (SR-130)</td></tr>
+      <tr><th scope="row">Locale</th><td>The result does not depend on host locale or Unicode version</td></tr>
+      <tr><th scope="row">Length</th><td>No maximum. The fold never truncates.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h2 id="steps">Fold steps</h2>
+  <p>The five steps apply in this order.</p>
+
+  <section class="field" id="step-1">
+    <h3>Step 1: lowercase ASCII letters <a class="anchor" href="#step-1" aria-label="Link to step 1">#</a></h3>
+    <p>Lowercase the ASCII letters <code>A</code> to <code>Z</code> only. Apply no other case mapping and no Unicode normalization, before, during, or after.</p>
+    <pre><code class="language-text">ICON       → icon
+Café       → café     (é is unchanged)</code></pre>
+  </section>
+
+  <section class="field" id="step-2">
+    <h3>Step 2: replace separator runs <a class="anchor" href="#step-2" aria-label="Link to step 2">#</a></h3>
+    <p>Replace every run of one or more characters from the separator class with a single hyphen.</p>
+    <div class="table-wrap" id="separator-class">
+    <table>
+      <thead><tr><th>Separator</th><th>Character</th><th>Code point</th></tr></thead>
+      <tbody>
+        <tr><td>Space</td><td><code> </code></td><td>U+0020</td></tr>
+        <tr><td>Underscore</td><td><code>_</code></td><td>U+005F</td></tr>
+        <tr><td>Period</td><td><code>.</code></td><td>U+002E</td></tr>
+        <tr><td>Forward slash</td><td><code>/</code></td><td>U+002F</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p>These four characters are the entire separator class. The hyphen is not in the class. Case changes are not separators: the fold does not hyphenate at case boundaries.</p>
+    <pre><code class="language-text">button_primary  → button-primary
+forms/button    → forms-button
+card-_header    → card--header</code></pre>
+  </section>
+
+  <section class="field" id="step-3">
+    <h3>Step 3: collapse hyphen runs <a class="anchor" href="#step-3" aria-label="Link to step 3">#</a></h3>
+    <p>Collapse every run of two or more hyphens to a single hyphen.</p>
+    <pre><code class="language-text">button--primary → button-primary
+card--header    → card-header</code></pre>
+  </section>
+
+  <section class="field" id="step-4">
+    <h3>Step 4: trim hyphens <a class="anchor" href="#step-4" aria-label="Link to step 4">#</a></h3>
+    <p>Remove leading and trailing hyphens.</p>
+    <pre><code class="language-text">-       → (empty)</code></pre>
+  </section>
+
+  <section class="field" id="step-5">
+    <h3>Step 5: change nothing else <a class="anchor" href="#step-5" aria-label="Link to step 5">#</a></h3>
+    <p>No other transformation applies. The fold does not truncate and imposes no maximum length. A 300-character declared name of ASCII letters folds to a 300-character identifier.</p>
+  </section>
+
+  <h2 id="classification">Classification of the result</h2>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>Result after step 5</th><th>Outcome</th><th>Reason string</th><th>Spec</th></tr></thead>
+    <tbody>
+      <tr id="empty-after-fold"><td>Empty</td><td>Rejected</td><td><code>empty after fold</code></td><td>SR-131</td></tr>
+      <tr id="residual-character"><td>Contains any character outside <code>a</code> to <code>z</code>, <code>0</code> to <code>9</code>, and hyphen</td><td>Rejected</td><td><code>carries residual character</code></td><td>SR-132</td></tr>
+      <tr><td>Otherwise</td><td>The result is the identifier</td><td>None</td><td>SR-130</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>A residual character is never transliterated, stripped, or decomposed. The rejection output names the offending character. <code>Café</code> is rejected with reason <code>carries residual character</code>, naming <code>é</code>; it never becomes <code>cafe</code>.</p>
+
+  <h2 id="worked-examples">Worked examples</h2>
+  <p>Each column shows the value after that step. "(same)" means the step made no change.</p>
+  <div class="table-wrap">
+  <table>
+    <thead>
+      <tr><th>Declared name</th><th>Step 1</th><th>Step 2</th><th>Step 3</th><th>Step 4</th><th>Outcome</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>Button_Primary</code></td><td><code>button_primary</code></td><td><code>button-primary</code></td><td class="same">(same)</td><td class="same">(same)</td><td><code>button-primary</code></td></tr>
+      <tr><td><code>Button Primary</code></td><td><code>button primary</code></td><td><code>button-primary</code></td><td class="same">(same)</td><td class="same">(same)</td><td><code>button-primary</code></td></tr>
+      <tr><td><code>Button.Primary</code></td><td><code>button.primary</code></td><td><code>button-primary</code></td><td class="same">(same)</td><td class="same">(same)</td><td><code>button-primary</code></td></tr>
+      <tr><td><code>Button--primary</code></td><td><code>button--primary</code></td><td class="same">(same)</td><td><code>button-primary</code></td><td class="same">(same)</td><td><code>button-primary</code></td></tr>
+      <tr><td><code>card-_header</code></td><td class="same">(same)</td><td><code>card--header</code></td><td><code>card-header</code></td><td class="same">(same)</td><td><code>card-header</code></td></tr>
+      <tr><td><code>forms/Button</code></td><td><code>forms/button</code></td><td><code>forms-button</code></td><td class="same">(same)</td><td class="same">(same)</td><td><code>forms-button</code></td></tr>
+      <tr><td><code>iconBadge</code></td><td><code>iconbadge</code></td><td class="same">(same)</td><td class="same">(same)</td><td class="same">(same)</td><td><code>iconbadge</code></td></tr>
+      <tr><td><code>ICON</code></td><td><code>icon</code></td><td class="same">(same)</td><td class="same">(same)</td><td class="same">(same)</td><td><code>icon</code></td></tr>
+      <tr><td><code>Café</code></td><td><code>café</code></td><td class="same">(same)</td><td class="same">(same)</td><td class="same">(same)</td><td>Rejected: <code>carries residual character</code> (<code>é</code>)</td></tr>
+      <tr><td><code>___</code></td><td class="same">(same)</td><td><code>-</code></td><td class="same">(same)</td><td>(empty)</td><td>Rejected: <code>empty after fold</code></td></tr>
+      <tr><td><code>/</code></td><td class="same">(same)</td><td><code>-</code></td><td class="same">(same)</td><td>(empty)</td><td>Rejected: <code>empty after fold</code></td></tr>
+      <tr><td>A single space</td><td class="same">(same)</td><td><code>-</code></td><td class="same">(same)</td><td>(empty)</td><td>Rejected: <code>empty after fold</code></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h2 id="collisions">Collisions</h2>
+
+  <section class="field" id="collision-scope">
+    <h3>Scope <a class="anchor" href="#collision-scope" aria-label="Link to collision scope">#</a></h3>
+    <dl class="field-meta">
+      <dt>Uniqueness</dt><dd><code>contractId</code> is unique within a manifest</dd>
+      <dt>Covers</dt><dd>Every declared name that contributes to that manifest, whatever its source kind</dd>
+      <dt>Does not cover</dt><dd>Previously published manifests. A <code>contractId</code> present in an earlier publish and absent now is not a collision.</dd>
+      <dt>Severity</dt><dd>Hard failure at publish. Never a silent merge.</dd>
+      <dt>Spec</dt><dd>SR-133</dd>
+    </dl>
+    <p>Two or more declared names that fold to the same identifier are a collision. A name from a Custom Elements Manifest (CEM) and a name from a React source collide exactly as two names in one file would.</p>
+  </section>
+
+  <section class="field" id="collision-reporting">
+    <h3>Reporting <a class="anchor" href="#collision-reporting" aria-label="Link to collision reporting">#</a></h3>
+    <ul>
+      <li>One collision report per identifier. The report names the identifier and every declared name that folded to it.</li>
+      <li>The publisher writes no contract for any of the colliding names.</li>
+      <li>A publish collects every rejection and every collision and reports them together. It does not stop at the first finding.</li>
+    </ul>
+    <span class="code-label">Example</span>
+    <div class="table-wrap">
+    <table>
+      <thead><tr><th>Declared names</th><th>Fold result</th><th>Outcome</th></tr></thead>
+      <tbody>
+        <tr><td><code>Button Primary</code>, <code>button_primary</code>, <code>Button--Primary</code></td><td><code>button-primary</code> (all three)</td><td>One collision report for <code>button-primary</code>, naming all three declared names. No contract is written for any of them.</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </section>
+
+  <section class="field" id="combined-example">
+    <h3>Combined publish example <a class="anchor" href="#combined-example" aria-label="Link to combined publish example">#</a></h3>
+    <p>A single publish with the declared names <code>Café</code>, <code>___</code>, <code>Button Primary</code>, <code>button_primary</code>, and <code>Button--Primary</code> reports three findings together:</p>
+    <ul>
+      <li><code>Café</code>: rejected, <code>carries residual character</code>, naming <code>é</code></li>
+      <li><code>___</code>: rejected, <code>empty after fold</code></li>
+      <li><code>button-primary</code>: one collision naming <code>Button Primary</code>, <code>button_primary</code>, and <code>Button--Primary</code></li>
+    </ul>
+  </section>
+
+  <h2 id="declared-name">Declared name</h2>
+  <section class="field" id="derivation-profile">
+    <h3>Derivation profile <a class="anchor" href="#derivation-profile" aria-label="Link to derivation profile">#</a></h3>
+    <p>v0.1 defines no derivation profile. Which source identifier counts as the declared name (for example a React export name, a CEM <code>tagName</code>, or a design-tool name) is left to the publisher's own documentation, stated per source kind.</p>
+    <p>The specification recommends (SHOULD, not a requirement) that a publisher fold the same source identifier for a component on every publish, so <code>contractId</code> stays stable across publishes.</p>
+  </section>
+
+  <h2 id="dsds-compatibility">DSDS compatibility</h2>
+  <p>Every fold result is a subset of the DSDS (Design System Documentation Specification) component <code>id</code> pattern:</p>
+  <pre><code class="language-text">contractId pattern:  ^[a-z0-9]+(-[a-z0-9]+)*$
+DSDS id pattern:     ^[a-z0-9]+(-[a-z0-9]+)*(\.[a-z0-9]+(-[a-z0-9]+)*)*$</code></pre>
+  <p>Every valid <code>contractId</code> is therefore a valid DSDS <code>id</code>. The reverse does not hold: a DSDS <code>id</code> can contain a period, and a <code>contractId</code> cannot.</p>
+  <p class="related">Related: <a href="dsds-integration.html">DSDS integration</a></p>
+
+  <h2 id="not-checked">What the schema checks</h2>
+  <p>The component contract schema checks only that <code>contractId</code> matches <code>^[a-z0-9]+(-[a-z0-9]+)*$</code>. It does not check that the value is the fold of a declared name, and it does not detect collisions. Both are publisher obligations. This repository ships no checker tool for them.</p>
+  <p class="related">Related: <a href="component-contract.html#contractid"><code>contractId</code> field</a>, <a href="scope.html#not-checked">Rules the schema does not check</a></p>
+</main>
+
+<nav class="sidebar" id="site-nav" aria-label="Reference topics">
+  <h2>Reference</h2>
+  <ul>
+    <li><a href="../index.html">Overview</a></li>
+    <li><a href="component-contract.html">Component contract</a></li>
+    <li><a href="manifest.html">Manifest</a></li>
+    <li><a href="contract-id.html" aria-current="page">contractId and the fold</a>
+      <ul class="subnav">
+        <li><a href="#steps">Fold steps</a></li>
+        <li><a href="#separator-class">Separator class</a></li>
+        <li><a href="#classification">Classification</a></li>
+        <li><a href="#worked-examples">Worked examples</a></li>
+        <li><a href="#collisions">Collisions</a></li>
+        <li><a href="#declared-name">Declared name</a></li>
+        <li><a href="#dsds-compatibility">DSDS compatibility</a></li>
+        <li><a href="#not-checked">What the schema checks</a></li>
+      </ul>
+    </li>
+    <li><a href="content-addressing.html">Content addressing</a></li>
+    <li><a href="dsds-integration.html">DSDS integration</a></li>
+    <li><a href="scope.html">Scope and limits</a></li>
+  </ul>
+</nav>
+</div>
+
+<footer class="site-footer">
+  Design System Contract, format v0.1, spec 0.11.0. Licensed Apache-2.0.
+</footer>
+</body>
+</html>

@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<!--
+  DRAFT for human review. Not reviewed for publication.
+  type: reference
+  audience: developers implementing tools that read, write, or validate Design System Contract files
+  source: schemas/component.contract.schema.json (v0.1), spec 0.11.0
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Component contract reference | Design System Contract</title>
+  <meta name="description" content="Every field, type, and constraint in the Design System Contract v0.1 component contract schema.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header class="site-header">
+  <a class="brand" href="../index.html" aria-label="Knapsack, Design System Contract reference home"><svg class="logo" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="491" height="96" fill="none" viewBox="0 0 491 96"><path fill="#0c092d" d="M450.1 0q1.6.1 1.8 1.8v33.6q0 .8-.4 1.2l-4.3 4.9c-1 1.2-1.1 3-.2 4.4l4.6 6.5q.3.5.3 1v22q-.2 1.7-1.8 1.9H438q-1.7-.1-1.8-1.8V1.8Q436.3.2 438 0z"/><path fill="#0c092d" d="M486.3 18.8c1.5 0 2.3 1.7 1.3 2.9l-18 20.8q-.8 1.2-.1 2.2l21 29.8c.8 1.1 0 2.8-1.5 2.8h-14q-.8 0-1.4-.8l-21.4-30.6c-1-1.4-.9-3.2.2-4.4l19.2-22.1q.5-.6 1.3-.6zM402 78.6a33 33 0 0 1-14.9-3.3q-6.6-3.3-10.5-10a34 34 0 0 1-3.7-16.7v-2.2q0-9.5 4-15.8 4-6.5 10.6-9.9 6.7-3.3 14.6-3.3 8.5 0 14.4 3 6 2.7 9 7.7 2.7 4.2 3.5 9.2 0 1.7-1.7 1.9h-12.8a2 2 0 0 1-1.9-1.4 10 10 0 0 0-3-4.8q-2.5-2.3-7.5-2.3-3.6 0-6.6 1.6t-4.8 5.2a19 19 0 0 0-1.8 8.9v2.2q0 5.8 1.7 9.6 1.7 3.6 4.7 5.4a13 13 0 0 0 6.8 1.7q4.2 0 7-2 2.4-2 3.5-5.1a2 2 0 0 1 1.8-1.4h12.9c1 0 1.8 1 1.7 2q-1 5.4-4 9.6a23 23 0 0 1-9.4 7.6 34 34 0 0 1-13.5 2.6m-70.4 0q-6.3 0-10.7-2.3-4.4-2.5-6.8-6.7t-2.3-9.5q0-8.7 5.2-13.2t16-4.5h17v-2.7q0-5.5-2.5-7.6Q345 30 340 30q-4.6 0-6.7 1.6-1.5.9-2 2.4t-2 1.6h-12.2q-1.7-.1-1.7-1.8a17 17 0 0 1 3.1-7.3q3-4.2 8.5-6.5a34 34 0 0 1 13.5-2.5q7.8 0 13.4 2.4 5.7 2.2 9 7.2 3 5 3.1 13.4v22l.6 12.8q-.1 1.8-1.8 2h-11.4q-1.4 0-1.7-1.5l-.4-5.6q-2.4 3.5-7.3 6a27 27 0 0 1-12.3 2.5m5-11.6a17 17 0 0 0 6.7-1.3q3-1.4 4.8-4a11 11 0 0 0 2-6.5v-2.7H336q-3.9 0-6 2a7 7 0 0 0-2.2 5q0 3.3 2.1 5.4 2.3 2 6.6 2m-57.3 11.6q-7.2 0-12.1-1.5a25 25 0 0 1-8.2-4 17 17 0 0 1-6.4-11.3q-.1-1.7 1.7-1.9h12.4q1.3.1 1.8 1.3a8 8 0 0 0 2.8 3.1q2.6 1.8 8 1.8 6 0 8.7-1.6 2.6-1.8 2.6-4.2 0-1.6-1.1-2.8a9 9 0 0 0-4-2.1 57 57 0 0 0-8.5-1.9q-4.8-.7-9-1.9t-7.4-3.3q-3.1-2-4.9-5.3a17 17 0 0 1 1.3-16.7q3-4.2 8.7-6.4 5.8-2.5 13.6-2.5 9 0 14.2 2.8 5.1 2.6 7.7 7 2 3.3 2.8 7 .1 1.7-1.7 1.9h-12.5q-1.2-.1-1.9-1.3a7 7 0 0 0-2.7-3.2 10 10 0 0 0-5.9-1.7q-5.1 0-7.4 1.7-2.1 1.5-2.2 3.8 0 2.6 2.9 3.9t10.3 2.3q4.8.6 9 2t7.5 3.3q3.4 2.1 5.2 5.3 2 3.2 2 7.8 0 5.4-3.2 9.6-3 4.2-9 6.7-6 2.3-15 2.3M190.7 96q-1.6-.1-1.7-1.8V20.5q.2-1.6 1.7-1.7H202q1.7.2 1.8 1.7V27q2.1-3.7 6.8-6.6 4.6-3 11.7-3 12 0 18.5 7.3t6.5 21.7v2.2q0 9.9-3.1 16.6a22 22 0 0 1-21.9 13.4q-5.5 0-10-2.3-4.5-2.5-7.4-6.8v24.7q-.2 1.7-1.8 1.8zm27.8-30.6q5.3 0 8.9-4.1 3.6-4.4 3.6-12.7v-2.2q0-8-3.5-11.9t-9-4q-4 0-7 1.6a12 12 0 0 0-5 4.7q-1.7 3-1.7 7.6v6.1q0 4.9 1.7 8.3 1.8 3.3 4.9 5 3 1.5 7 1.6m-73.1 13.2q-6.3 0-10.7-2.3-4.5-2.5-6.7-6.7-2.4-4.2-2.4-9.5 0-8.7 5.2-13.2 5.4-4.5 16-4.5h17v-2.7q0-5.5-2.5-7.6-2.5-2.2-7.6-2.2-4.5 0-6.6 1.6-1.4.9-2 2.4-.5 1.5-2 1.6h-12.3q-1.7-.1-1.6-1.8a17 17 0 0 1 3-7.3q3-4.2 8.6-6.5a34 34 0 0 1 13.4-2.5q7.8 0 13.4 2.4 5.7 2.2 9 7.2t3.2 13.4v22l.5 12.8q0 1.8-1.8 2h-11.3q-1.6 0-1.8-1.5l-.3-5.6q-2.4 3.5-7.3 6a27 27 0 0 1-12.4 2.5m5-11.6a17 17 0 0 0 6.7-1.3q3-1.4 4.9-4a11 11 0 0 0 1.9-6.5v-2.7h-14q-4 0-6.1 2a7 7 0 0 0-2.1 5q0 3.3 2 5.4 2.2 2 6.7 2M64.5 77.3q-1.6-.2-1.8-1.8v-55q.1-1.6 1.8-1.7h11q1.6.2 1.8 1.7V27q2.3-4 6.9-6.7 4.6-3 12.6-2.9 10.5 0 15.9 5.8 5.3 5.6 5.3 16.3v36q-.1 1.6-1.8 1.8H104q-1.6-.2-1.8-1.8V43q0-6.1-2.7-9.2-2.5-3-8.6-3.1a13 13 0 0 0-7 1.7 10 10 0 0 0-4.1 4.6q-1.3 2.7-1.3 6v32.5q-.2 1.6-1.7 1.8zM15.2 0Q17 .2 17 1.8v33.6q0 .8-.4 1.2l-4.3 4.9c-1 1.2-1.1 3-.2 4.4l4.6 6.5q.3.5.3 1v22q-.1 1.7-1.8 1.9H3q-1.6-.2-1.8-1.8V1.8Q1.3.2 3 0z"/><path fill="#0c092d" d="M51.3 18.8c1.6 0 2.4 1.7 1.4 2.9l-18 20.8q-.8 1.2-.1 2.2l21 29.8c.8 1.1 0 2.8-1.5 2.8h-14q-1 0-1.4-.8L17.3 45.9c-1-1.4-.9-3.2.2-4.4l19.2-22.1q.5-.6 1.3-.6z"/></svg></a>
+  <a class="site-title" href="../index.html">Design System Contract</a>
+  <span class="badge">format v0.1 · spec 0.11.0</span>
+  <a class="header-jump" href="#site-nav">Reference topics</a>
+</header>
+
+<div class="layout">
+<main id="content">
+  <h1>Component contract</h1>
+  <p class="lede">One file, one component. It records the component's identity, its display name, its typed props, its slots, and its states.</p>
+
+  <div class="table-wrap">
+  <table>
+    <tbody>
+      <tr><th scope="row">Schema file</th><td><a href="../schemas/v0/component.contract.schema.json"><code>schemas/v0/component.contract.schema.json</code></a></td></tr>
+      <tr><th scope="row">Dialect</th><td><code>https://json-schema.org/draft/2020-12/schema</code></td></tr>
+      <tr><th scope="row"><code>$id</code></th><td><code>https://knapsack-labs.github.io/design-system-contract/schemas/v0/component.contract.schema.json</code> (identifier only, not a network location; see <a href="scope.html#schema-ids">schema identifiers</a>)</td></tr>
+      <tr><th scope="row">Root type</th><td><code>object</code></td></tr>
+      <tr><th scope="row">Required</th><td><code>contractId</code>, <code>component</code></td></tr>
+      <tr><th scope="row">Additional members</th><td>Not permitted (<code>additionalProperties: false</code>)</td></tr>
+      <tr><th scope="row">Example file</th><td><a href="../examples/button-primary.contract.json"><code>examples/button-primary.contract.json</code></a></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>The smallest valid component contract carries only the two required members.</p>
+  <pre><code class="language-json">{ "contractId": "button-primary", "component": "Button Primary" }</code></pre>
+
+  <h2 id="summary">Field summary</h2>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>Member</th><th>Type</th><th>Required</th><th>Constraint</th></tr></thead>
+    <tbody>
+      <tr><td><a href="#schema"><code>$schema</code></a></td><td>string</td><td>No</td><td><code>minLength: 1</code></td></tr>
+      <tr><td><a href="#contractid"><code>contractId</code></a></td><td>string</td><td>Yes</td><td>pattern <code>^[a-z0-9]+(-[a-z0-9]+)*$</code></td></tr>
+      <tr><td><a href="#component"><code>component</code></a></td><td>string</td><td>Yes</td><td><code>minLength: 1</code></td></tr>
+      <tr><td><a href="#description"><code>description</code></a></td><td>string</td><td>No</td><td>None</td></tr>
+      <tr><td><a href="#cemref"><code>cemRef</code></a></td><td>string</td><td>No</td><td><code>minLength: 1</code></td></tr>
+      <tr><td><a href="#shadcnref"><code>shadcnRef</code></a></td><td>string</td><td>No</td><td><code>minLength: 1</code></td></tr>
+      <tr><td><a href="#props"><code>props</code></a></td><td>object</td><td>No</td><td>See <a href="#props"><code>props</code></a></td></tr>
+      <tr><td><a href="#slots"><code>slots</code></a></td><td>array of slot</td><td>No</td><td>Items: non-empty string or slot record</td></tr>
+      <tr><td><a href="#states"><code>states</code></a></td><td>array of string</td><td>No</td><td>Items: <code>minLength: 1</code></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>The schema defines no schema-level default values. The only defaults in a contract are per-prop <a href="#prop-default"><code>default</code></a> values that the contract itself declares.</p>
+
+  <h2 id="root-members">Root members</h2>
+
+  <section class="field" id="schema">
+    <h3><code>$schema</code> <a class="anchor" href="#schema" aria-label="Link to $schema">#</a></h3>
+    <dl class="field-meta">
+      <dt>Path</dt><dd><code>/$schema</code></dd>
+      <dt>Type</dt><dd><code>string</code></dd>
+      <dt>Required</dt><dd><span class="req req--no">Optional</span></dd>
+      <dt>Constraints</dt><dd><code>minLength: 1</code></dd>
+      <dt>Default</dt><dd>None</dd>
+    </dl>
+    <p>Optional pointer to this schema. The URL is the schema's <code>$id</code> and is served from this site.</p>
+    <pre><code class="language-json">"$schema": "https://knapsack-labs.github.io/design-system-contract/schemas/v0/component.contract.schema.json"</code></pre>
+    <p class="related">Related: <a href="scope.html#schema-ids">Schema identifiers</a></p>
+  </section>
+
+  <section class="field" id="contractid">
+    <h3><code>contractId</code> <a class="anchor" href="#contractid" aria-label="Link to contractId">#</a></h3>
+    <dl class="field-meta">
+      <dt>Path</dt><dd><code>/contractId</code></dd>
+      <dt>Type</dt><dd><code>string</code></dd>
+      <dt>Required</dt><dd><span class="req req--yes">Required</span></dd>
+      <dt>Constraints</dt><dd>pattern <code>^[a-z0-9]+(-[a-z0-9]+)*$</code></dd>
+      <dt>Default</dt><dd>None</dd>
+    </dl>
+    <p>The contract's normative identity: the fold of the component's declared name. Lowercase letters and digits in hyphen-separated segments. Not namespaced and not versioned. Every valid <code>contractId</code> is also a valid DSDS (Design System Documentation Specification) component <code>id</code>. Unique within a manifest.</p>
+    <span class="code-label">Valid</span>
+    <pre><code class="language-json">"contractId": "button-primary"</code></pre>
+    <span class="code-label">Invalid against the pattern</span>
+    <pre><code class="language-jsonc">"contractId": "Button-Primary"    // uppercase letter
+"contractId": "button--primary"   // empty segment between hyphens
+"contractId": "-button"           // leading hyphen
+"contractId": "forms.button"      // period</code></pre>
+    <p>The schema checks the pattern only. It does not check that the value is the fold of any declared name, and it does not check uniqueness across a manifest.</p>
+    <p class="related">Related: <a href="contract-id.html">The fold</a>, <a href="contract-id.html#collisions">Collisions</a>, <a href="dsds-integration.html#specs-pointer">DSDS <code>specs</code> pointer</a></p>
+  </section>
+
+  <section class="field" id="component">
+    <h3><code>component</code> <a class="anchor" href="#component" aria-label="Link to component">#</a></h3>
+    <dl class="field-meta">
+      <dt>Path</dt><dd><code>/component</code></dd>
+      <dt>Type</dt><dd><code>string</code></dd>
+      <dt>Required</dt><dd><span class="req req--yes">Required</span></dd>
+      <dt>Constraints</dt><dd><code>minLength: 1</code></dd>
+      <dt>Default</dt><dd>None</dd>
+    </dl>
+    <p>The design system's own display name for the component, carried verbatim. Never folded, and may differ from <code>contractId</code>. A publisher does not derive it from <code>contractId</code> and does not require it to equal <code>contractId</code> (SR-123).</p>
+    <pre><code class="language-json">"contractId": "button-primary",
+"component": "Button Primary"</code></pre>
+    <p class="related">Related: <a href="#contractid"><code>contractId</code></a></p>
+  </section>
+
+  <section class="field" id="description">
+    <h3><code>description</code> <a class="anchor" href="#description" aria-label="Link to description">#</a></h3>
+    <dl class="field-meta">
+      <dt>Path</dt><dd><code>/description</code></dd>
+      <dt>Type</dt><dd><code>string</code></dd>
+      <dt>Required</dt><dd><span class="req req--no">Optional</span></dd>
+      <dt>Constraints</dt><dd>None. An empty string is valid.</dd>
+      <dt>Default</dt><dd>None</dd>
+    </dl>
+    <p>Human-readable summary of the component.</p>
+    <pre><code class="language-json">"description": "The primary call-to-action button."</code></pre>
+  </section>
+
+  <section class="field" id="cemref">
+    <h3><code>cemRef</code> <a class="anchor" href="#cemref" aria-label="Link to cemRef">#</a></h3>
+    <dl class="field-meta">
+      <dt>Path</dt><dd><code>/cemRef</code></dd>
+      <dt>Type</dt><dd><code>string</code></dd>
+      <dt>Required</dt><dd><span class="req req--no">Optional</span></dd>
+      <dt>Constraints</dt><dd><code>minLength: 1</code>. No format constraint on the identifier.</dd>
+      <dt>Default</dt><dd>None</dd>
+    </dl>
+    <p>Custom Elements Manifest (CEM) identifier for this component. Carried as an identifier only; the contract does not restate the shape of the CEM entry.</p>
+    <span class="code-label">Illustrative value</span>
+    <pre><code class="language-json">"cemRef": "ds-button-primary"</code></pre>
+  </section>
+
+  <section class="field" id="shadcnref">
+    <h3><code>shadcnRef</code> <a class="anchor" href="#shadcnref" aria-label="Link to shadcnRef">#</a></h3>
+    <dl class="field-meta">
+      <dt>Path</dt><dd><code>/shadcnRef</code></dd>
+      <dt>Type</dt><dd><code>string</code></dd>
+      <dt>Required</dt><dd><span class="req req--no">Optional</span></dd>
+      <dt>Constraints</dt><dd><code>minLength: 1</code>. No format constraint on the identifier.</dd>
+      <dt>Default</dt><dd>None</dd>
+    </dl>
+    <p>shadcn registry item identifier for this component. Carried as an identifier only; the contract does not restate the shape of the registry item.</p>
+    <span class="code-label">Illustrative value</span>
+    <pre><code class="language-json">"shadcnRef": "button"</code></pre>
+  </section>
+
+  <section class="field" id="unknown-members">
+    <h3>Any other root member <a class="anchor" href="#unknown-members" aria-label="Link to other root members">#</a></h3>
+    <dl class="field-meta">
+      <dt>Rule</dt><dd><code>additionalProperties: false</code> at the root</dd>
+    </dl>
+    <p>A root member not listed on this page fails schema validation. The format has no <code>variants</code> member (SR-128); variant axes are <a href="#variant-axes">enum-typed props</a>.</p>
+    <span class="code-label">Fails validation</span>
+    <pre><code class="language-json">{
+  "contractId": "button-primary",
+  "component": "Button Primary",
+  "variants": { "variant": ["primary", "secondary"] }
+}</code></pre>
+  </section>
+
+  <h2 id="props-object">Props</h2>
+
+  <section class="field" id="props">
+    <h3><code>props</code> <a class="anchor" href="#props" aria-label="Link to props">#</a></h3>
+    <dl class="field-meta">
+      <dt>Path</dt><dd><code>/props</code></dd>
+      <dt>Type</dt><dd><code>object</code> (<code>$defs/props</code>)</dd>
+      <dt>Required</dt><dd><span class="req req--no">Optional</span></dd>
+      <dt>Members</dt><dd><a href="#props-properties"><code>properties</code></a>, <a href="#props-required"><code>required</code></a>, <a href="#props-additionalproperties"><code>additionalProperties</code></a> (required). No other member is permitted.</dd>
+      <dt>Default</dt><dd>When omitted, the component declares an empty, closed prop set.</dd>
+    </dl>
+    <p>The component's props, written as a JSON Schema 2020-12 object schema. A stock JSON Schema validator can check a prop bag against it directly. When <code>props</code> is present, <code>additionalProperties</code> is required and states whether undeclared props are allowed.</p>
+    <pre><code class="language-json">"props": {
+  "properties": {
+    "label":    { "type": "string", "description": "Visible text" },
+    "variant":  { "type": "string", "enum": ["primary", "secondary"], "default": "primary" },
+    "disabled": { "type": "boolean", "default": false }
+  },
+  "required": ["label"],
+  "additionalProperties": false
+}</code></pre>
+    <p class="related">Related: <a href="#empty-prop-set">Empty prop set</a>, <a href="#prop">Prop schema</a></p>
+  </section>
+
+  <section class="field" id="props-properties">
+    <h3><code>props.properties</code> <a class="anchor" href="#props-properties" aria-label="Link to props.properties">#</a></h3>
+    <dl class="field-meta">
+      <dt>Path</dt><dd><code>/props/properties</code></dd>
+      <dt>Type</dt><dd><code>object</code>; every value is a <a href="#prop">prop schema</a></dd>
+      <dt>Required</dt><dd><span class="req req--no">Optional</span></dd>
+      <dt>Constraints</dt><dd>No constraint on key names. An empty object is valid.</dd>
+      <dt>Default</dt><dd>None. When omitted or empty, the prop set is empty and its openness is <code>props.additionalProperties</code> (SR-048).</dd>
+    </dl>
+    <p>Map from prop name to that prop's schema. The schema places no pattern on prop names; <code>""</code> is a legal key.</p>
+    <pre><code class="language-json">"properties": {
+  "label": { "type": "string" },
+  "size":  { "type": "string", "enum": ["sm", "md", "lg"], "default": "md" }
+}</code></pre>
+  </section>
+
+  <section class="field" id="props-required">
+    <h3><code>props.required</code> <a class="anchor" href="#props-required" aria-label="Link to props.required">#</a></h3>
+    <dl class="field-meta">
+      <dt>Path</dt><dd><code>/props/required</code></dd>
+      <dt>Type</dt><dd><code>array</code> of <code>string</code></dd>
+      <dt>Required</dt><dd><span class="req req--no">Optional</span></dd>
+      <dt>Constraints</dt><dd><code>uniqueItems: true</code></dd>
+      <dt>Default</dt><dd>None</dd>
+    </dl>
+    <p>Names of props a usage must supply. Every name must be a key of <code>props.properties</code>. The schema cannot check this; a publisher checks it at publish and fails the publish naming the prop (SR-126).</p>
+    <pre><code class="language-json">"required": ["label"]</code></pre>
+    <span class="code-label">Fails schema validation (duplicate item)</span>
+    <pre><code class="language-json">"required": ["label", "label"]</code></pre>
+    <span class="code-label">Passes schema validation, fails at publish (<code>icon</code> is not a key of <code>properties</code>)</span>
+    <pre><code class="language-json">"properties": { "label": { "type": "string" } },
+"required": ["icon"]</code></pre>
+  </section>
+
+  <section class="field" id="props-additionalproperties">
+    <h3><code>props.additionalProperties</code> <a class="anchor" href="#props-additionalproperties" aria-label="Link to props.additionalProperties">#</a></h3>
+    <dl class="field-meta">
+      <dt>Path</dt><dd><code>/props/additionalProperties</code></dd>
+      <dt>Type</dt><dd><code>boolean</code></dd>
+      <dt>Required</dt><dd><span class="req req--cond">Required when <code>props</code> is present</span></dd>
+      <dt>Constraints</dt><dd>Boolean only. A schema object is not permitted.</dd>
+      <dt>Default</dt><dd>None</dd>
+    </dl>
+    <div class="table-wrap">
+    <table>
+      <thead><tr><th>Value</th><th>Meaning</th></tr></thead>
+      <tbody>
+        <tr><td><code>false</code></td><td>A prop outside <code>properties</code> is undeclared (closed).</td></tr>
+        <tr><td><code>true</code></td><td>Any prop is permitted (open).</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <span class="code-label">Fails validation (<code>additionalProperties</code> missing)</span>
+    <pre><code class="language-json">"props": { "properties": { "label": { "type": "string" } } }</code></pre>
+  </section>
+
+  <div class="callout" id="empty-prop-set">
+    <span class="callout-title">Empty prop set: three equivalent forms</span>
+    <p>Each of these declares that the component takes no props. All three are schema-equivalent.</p>
+    <ol>
+      <li>Omit <code>props</code> entirely.</li>
+      <li><code>"props": { "additionalProperties": false }</code> (no <code>properties</code> key).</li>
+      <li><code>"props": { "properties": {}, "additionalProperties": false }</code></li>
+    </ol>
+    <p><code>"props": { "additionalProperties": true }</code> with no <code>properties</code> declares an empty prop set that is open: no declared props, any prop permitted (SR-048).</p>
+  </div>
+
+  <h2 id="prop-schema">Prop schema</h2>
+
+  <section class="field" id="prop">
+    <h3>Prop (<code>$defs/prop</code>) <a class="anchor" href="#prop" aria-label="Link to prop schema">#</a></h3>
+    <dl class="field-meta">
+      <dt>Path</dt><dd><code>/props/properties/{name}</code></dd>
+      <dt>Type</dt><dd><code>object</code></dd>
+      <dt>Required members</dt><dd><a href="#prop-type"><code>type</code></a></dd>
+      <dt>Permitted members</dt><dd><code>type</code>, <code>default</code>, <code>description</code>, <code>enum</code>. No other member (<code>additionalProperties: false</code>).</dd>
+    </dl>
+    <p>One prop's schema. If both <code>enum</code> and <code>default</code> are present, <code>default</code> must be one of the <code>enum</code> values. The schema cannot check this; a publisher checks it at publish and fails the publish naming the prop (SR-127).</p>
+    <pre><code class="language-json">"variant": { "type": "string", "enum": ["primary", "secondary"], "default": "primary" }</code></pre>
+    <span class="code-label">Fails validation (keyword outside the permitted four)</span>
+    <pre><code class="language-json">"count": { "type": "integer", "minimum": 0 }</code></pre>
+  </section>
+
+  <section class="field" id="prop-type">
+    <h4><code>type</code> <a class="anchor" href="#prop-type" aria-label="Link to prop type">#</a></h4>
+    <dl class="field-meta">
+      <dt>Path</dt><dd><code>/props/properties/{name}/type</code></dd>
+      <dt>Type</dt><dd>A <a href="#type-names">type name</a> string, or an array of type names</dd>
+      <dt>Required</dt><dd><span class="req req--yes">Required</span></dd>
+      <dt>Constraints</dt><dd>Array form: <code>minItems: 1</code>, <code>uniqueItems: true</code></dd>
+      <dt>Default</dt><dd>None</dd>
+    </dl>
+    <p>A JSON Schema 2020-12 type name, or an array of them.</p>
+    <span class="code-label">Valid</span>
+    <pre><code class="language-json">"type": "string"
+"type": ["string", "null"]</code></pre>
+    <span class="code-label">Invalid</span>
+    <pre><code class="language-jsonc">"type": "float"               // not a type name
+"type": []                    // minItems: 1
+"type": ["string", "string"]  // uniqueItems</code></pre>
+  </section>
+
+  <section class="field" id="type-names">
+    <h4>Type names (<code>$defs/typeName</code>) <a class="anchor" href="#type-names" aria-label="Link to type names">#</a></h4>
+    <p>Exactly the seven JSON Schema 2020-12 primitive type names:</p>
+    <p><code>string</code>, <code>number</code>, <code>integer</code>, <code>boolean</code>, <code>array</code>, <code>object</code>, <code>null</code></p>
+    <p>A prop typed <code>array</code> or <code>object</code> carries no <code>items</code> or <code>properties</code>; those keywords are not permitted on a prop in v0.1.</p>
+  </section>
+
+  <section class="field" id="prop-default">
+    <h4><code>default</code> <a class="anchor" href="#prop-default" aria-label="Link to prop default">#</a></h4>
+    <dl class="field-meta">
+      <dt>Path</dt><dd><code>/props/properties/{name}/default</code></dd>
+      <dt>Type</dt><dd>Any JSON value</dd>
+      <dt>Required</dt><dd><span class="req req--no">Optional</span></dd>
+      <dt>Constraints</dt><dd>None in the schema. If <code>enum</code> is present, must be one of its values (publisher-checked, SR-127).</dd>
+    </dl>
+    <p>The value used when a usage does not supply this prop.</p>
+    <pre><code class="language-json">"disabled": { "type": "boolean", "default": false }</code></pre>
+    <span class="code-label">Passes schema validation, fails at publish</span>
+    <pre><code class="language-json">"variant": { "type": "string", "enum": ["primary", "secondary"], "default": "tertiary" }</code></pre>
+  </section>
+
+  <section class="field" id="prop-description">
+    <h4><code>description</code> <a class="anchor" href="#prop-description" aria-label="Link to prop description">#</a></h4>
+    <dl class="field-meta">
+      <dt>Path</dt><dd><code>/props/properties/{name}/description</code></dd>
+      <dt>Type</dt><dd><code>string</code></dd>
+      <dt>Required</dt><dd><span class="req req--no">Optional</span></dd>
+      <dt>Constraints</dt><dd>None</dd>
+    </dl>
+    <p>Human-readable summary of the prop.</p>
+    <pre><code class="language-json">"label": { "type": "string", "description": "Visible text" }</code></pre>
+  </section>
+
+  <section class="field" id="prop-enum">
+    <h4><code>enum</code> <a class="anchor" href="#prop-enum" aria-label="Link to prop enum">#</a></h4>
+    <dl class="field-meta">
+      <dt>Path</dt><dd><code>/props/properties/{name}/enum</code></dd>
+      <dt>Type</dt><dd><code>array</code> of any JSON values</dd>
+      <dt>Required</dt><dd><span class="req req--no">Optional</span></dd>
+      <dt>Constraints</dt><dd>None beyond <code>type: array</code>. No <code>minItems</code> and no <code>uniqueItems</code>.</dd>
+    </dl>
+    <p>The allowed values. A prop carrying <code>enum</code> is a variant axis.</p>
+    <pre><code class="language-json">"size": { "type": "string", "enum": ["sm", "md", "lg"], "default": "md" }</code></pre>
+    <div class="callout callout--warning">
+      <span class="callout-title">Current schema behavior</span>
+      <p><code>"enum": []</code> validates against the v0.1 schema. The schema also does not check that <code>enum</code> values match the prop's <code>type</code>.</p>
+    </div>
+    <p class="related">Related: <a href="#variant-axes">Variant axes</a>, <a href="dsds-integration.html#trait-mapping">DSDS trait mapping</a></p>
+  </section>
+
+  <section class="field" id="variant-axes">
+    <h3>Variant axes <a class="anchor" href="#variant-axes" aria-label="Link to variant axes">#</a></h3>
+    <p>Any prop whose schema carries <code>enum</code> is a variant axis, whatever its name. A prop named <code>variant</code> has no special status. The format declares no separate <code>variants</code> member (SR-128).</p>
+    <pre><code class="language-json">"properties": {
+  "variant": { "type": "string", "enum": ["primary", "secondary"], "default": "primary" },
+  "tone":    { "type": "string", "enum": ["neutral", "brand"] }
+}</code></pre>
+    <p>This example declares two variant axes: <code>variant</code> and <code>tone</code>.</p>
+  </section>
+
+  <h2 id="slots-and-states">Slots and states</h2>
+
+  <div class="callout">
+    <span class="callout-title">Slots and states are not symmetric</span>
+    <p>A <code>slots</code> item is a bare name or a record that can carry <code>description</code> and <code>a11y</code>. A <code>states</code> item is a plain string only. v0.1 has no per-state metadata.</p>
+  </div>
+
+  <section class="field" id="slots">
+    <h3><code>slots</code> <a class="anchor" href="#slots" aria-label="Link to slots">#</a></h3>
+    <dl class="field-meta">
+      <dt>Path</dt><dd><code>/slots</code></dd>
+      <dt>Type</dt><dd><code>array</code>; each item is a non-empty string or a <a href="#slot-record">slot record</a> (<code>oneOf</code>)</dd>
+      <dt>Required</dt><dd><span class="req req--no">Optional</span></dd>
+      <dt>Constraints</dt><dd>String items: <code>minLength: 1</code>. No <code>uniqueItems</code>.</dd>
+      <dt>Default</dt><dd>None</dd>
+    </dl>
+    <p>Named insertion points the component exposes. How a publisher obtains slot names is not specified.</p>
+    <pre><code class="language-json">"slots": [
+  "icon",
+  { "name": "body", "a11y": { "nameFrom": "content", "required": true } }
+]</code></pre>
+  </section>
+
+  <section class="field" id="slot-record">
+    <h4>Slot record (<code>$defs/slotRecord</code>) <a class="anchor" href="#slot-record" aria-label="Link to slot record">#</a></h4>
+    <dl class="field-meta">
+      <dt>Path</dt><dd><code>/slots/{index}</code></dd>
+      <dt>Type</dt><dd><code>object</code></dd>
+      <dt>Required members</dt><dd><code>name</code></dd>
+      <dt>Permitted members</dt><dd><code>name</code>, <code>description</code>, <code>a11y</code>. No other member.</dd>
+    </dl>
+    <div class="table-wrap">
+    <table>
+      <thead><tr><th>Member</th><th>Type</th><th>Required</th><th>Constraint</th></tr></thead>
+      <tbody>
+        <tr id="slot-name"><td><code>name</code></td><td>string</td><td>Yes</td><td><code>minLength: 1</code></td></tr>
+        <tr id="slot-description"><td><code>description</code></td><td>string</td><td>No</td><td>None</td></tr>
+        <tr id="slot-a11y"><td><code>a11y</code></td><td>object</td><td>No</td><td><a href="#slot-accessibility">Slot accessibility</a></td></tr>
+      </tbody>
+    </table>
+    </div>
+    <pre><code class="language-json">{ "name": "body", "description": "Main content", "a11y": { "nameFrom": "content", "required": true } }</code></pre>
+  </section>
+
+  <section class="field" id="slot-accessibility">
+    <h4>Slot accessibility (<code>$defs/slotAccessibility</code>) <a class="anchor" href="#slot-accessibility" aria-label="Link to slot accessibility">#</a></h4>
+    <dl class="field-meta">
+      <dt>Path</dt><dd><code>/slots/{index}/a11y</code></dd>
+      <dt>Type</dt><dd><code>object</code></dd>
+      <dt>Required members</dt><dd>None</dd>
+      <dt>Permitted members</dt><dd><code>role</code>, <code>nameFrom</code>, <code>required</code>. No other member.</dd>
+    </dl>
+    <p>Accessibility requirements for a slot. Role and naming vocabulary are those of ARIA (Accessible Rich Internet Applications). The schema accepts any non-empty string for <code>role</code> and <code>nameFrom</code>; it does not restrict values to the ARIA vocabulary.</p>
+    <div class="table-wrap">
+    <table>
+      <thead><tr><th>Member</th><th>Type</th><th>Required</th><th>Constraint</th></tr></thead>
+      <tbody>
+        <tr id="a11y-role"><td><code>role</code></td><td>string</td><td>No</td><td><code>minLength: 1</code></td></tr>
+        <tr id="a11y-namefrom"><td><code>nameFrom</code></td><td>string</td><td>No</td><td><code>minLength: 1</code></td></tr>
+        <tr id="a11y-required"><td><code>required</code></td><td>boolean</td><td>No</td><td>None. The schema gives this member no description. <mark class="verify">[VERIFY]</mark> intended meaning</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <pre><code class="language-json">"a11y": { "nameFrom": "content", "required": true }</code></pre>
+  </section>
+
+  <section class="field" id="states">
+    <h3><code>states</code> <a class="anchor" href="#states" aria-label="Link to states">#</a></h3>
+    <dl class="field-meta">
+      <dt>Path</dt><dd><code>/states</code></dd>
+      <dt>Type</dt><dd><code>array</code> of <code>string</code></dd>
+      <dt>Required</dt><dd><span class="req req--no">Optional</span></dd>
+      <dt>Constraints</dt><dd>Items: <code>minLength: 1</code>. No <code>uniqueItems</code>. Object items are not permitted.</dd>
+      <dt>Default</dt><dd>None</dd>
+    </dl>
+    <p>Named conditions the component can be in. How a publisher obtains state names is not specified.</p>
+    <pre><code class="language-json">"states": ["hover", "disabled"]</code></pre>
+    <span class="code-label">Fails validation (states carry no records)</span>
+    <pre><code class="language-json">"states": [{ "name": "hover" }]</code></pre>
+    <p class="related">Related: <a href="dsds-integration.html#trait-mapping">DSDS trait mapping</a></p>
+  </section>
+
+  <h2 id="not-checked">Rules the schema does not check</h2>
+  <p>A JSON Schema validator that accepts a component contract has not checked the following. Each is a publisher obligation in the specification. This repository ships no checker tool for them.</p>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>Rule</th><th>Checked by</th><th>Spec</th></tr></thead>
+    <tbody>
+      <tr><td><code>contractId</code> is the fold of the declared name</td><td>Publisher</td><td>SR-130</td></tr>
+      <tr><td><code>contractId</code> is unique within the manifest</td><td>Publisher</td><td>SR-133</td></tr>
+      <tr><td>Every <code>props.required</code> name is a key of <code>props.properties</code></td><td>Publisher</td><td>SR-126</td></tr>
+      <tr><td><code>default</code> is one of the <code>enum</code> values when both are present</td><td>Publisher</td><td>SR-127</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h2 id="full-example">Complete example</h2>
+  <p>Source: <a href="../examples/button-primary.contract.json"><code>examples/button-primary.contract.json</code></a></p>
+  <pre><code class="language-json">{
+  "$schema": "https://knapsack-labs.github.io/design-system-contract/schemas/v0/component.contract.schema.json",
+  "contractId": "button-primary",
+  "component": "Button Primary",
+  "description": "The primary call-to-action button.",
+  "props": {
+    "properties": {
+      "label": { "type": "string", "description": "Visible text" },
+      "variant": { "type": "string", "enum": ["primary", "secondary"], "default": "primary" },
+      "disabled": { "type": "boolean", "default": false }
+    },
+    "required": ["label"],
+    "additionalProperties": false
+  },
+  "slots": [
+    "icon",
+    { "name": "body", "a11y": { "nameFrom": "content", "required": true } }
+  ],
+  "states": ["hover", "disabled"]
+}</code></pre>
+</main>
+
+<nav class="sidebar" id="site-nav" aria-label="Reference topics">
+  <h2>Reference</h2>
+  <ul>
+    <li><a href="../index.html">Overview</a></li>
+    <li><a href="component-contract.html" aria-current="page">Component contract</a>
+      <ul class="subnav">
+        <li><a href="#summary">Field summary</a></li>
+        <li><a href="#contractid"><code>contractId</code></a></li>
+        <li><a href="#component"><code>component</code></a></li>
+        <li><a href="#props"><code>props</code></a></li>
+        <li><a href="#props-additionalproperties"><code>additionalProperties</code></a></li>
+        <li><a href="#empty-prop-set">Empty prop set</a></li>
+        <li><a href="#prop">Prop schema</a></li>
+        <li><a href="#prop-enum"><code>enum</code></a></li>
+        <li><a href="#variant-axes">Variant axes</a></li>
+        <li><a href="#slots"><code>slots</code></a></li>
+        <li><a href="#states"><code>states</code></a></li>
+        <li><a href="#not-checked">Not checked by the schema</a></li>
+        <li><a href="#full-example">Complete example</a></li>
+      </ul>
+    </li>
+    <li><a href="manifest.html">Manifest</a></li>
+    <li><a href="contract-id.html">contractId and the fold</a></li>
+    <li><a href="content-addressing.html">Content addressing</a></li>
+    <li><a href="dsds-integration.html">DSDS integration</a></li>
+    <li><a href="scope.html">Scope and limits</a></li>
+  </ul>
+</nav>
+</div>
+
+<footer class="site-footer">
+  Design System Contract, format v0.1, spec 0.11.0. Licensed Apache-2.0.
+</footer>
+</body>
+</html>

@@ -1,0 +1,18 @@
+Ajv
+[Cc]anonicalization
+contractId
+contractVersion
+cemRef
+shadcnRef
+nameFrom
+shadcn
+npm
+[Ee]num
+[Bb]oolean
+namespaced
+validator
+DSDS
+Design System Contract
+Design System Documentation Specification
+Custom Elements Manifest
+Figma

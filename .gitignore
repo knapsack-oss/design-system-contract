@@ -1,0 +1,3 @@
+# Vale style packages are fetched by `vale sync`; only the local vocabulary is tracked.
+.vale/styles/*
+!.vale/styles/config/
