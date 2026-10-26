@@ -17,6 +17,7 @@ const validateContract = ajv.compile(load('schemas/component.contract.schema.jso
 const validateManifest = ajv.compile(load('schemas/manifest.schema.json'));
 
 const example = load('examples/button-primary.contract.json');
+const deprecatedExample = load('examples/chip.contract.json');
 const manifest = load('examples/manifest.json');
 const minimal = { contractId: 'button-primary', component: 'Button Primary' };
 const contract = (extra) => validateContract({ ...clone(minimal), ...extra });
@@ -28,6 +29,7 @@ const address = (doc) =>
 
 test('examples validate', () => {
   assert.ok(validateContract(example), JSON.stringify(validateContract.errors));
+  assert.ok(validateContract(deprecatedExample), JSON.stringify(validateContract.errors));
   assert.ok(validateManifest(manifest), JSON.stringify(validateManifest.errors));
 });
 
@@ -91,4 +93,25 @@ test('SCN-016: manifest shape', () => {
   assert.ok(withRecord({ origin: 'inferred' }));
   assert.ok(!withRecord({ ratified: true }));
   assert.ok(!withRecord({ address: 'sha256:ABC' }));
+});
+
+test('SCN-019: deprecated props', () => {
+  const prop = (deprecated) =>
+    contract({ props: { properties: { dense: { type: 'boolean', deprecated } }, additionalProperties: false } });
+  assert.ok(prop(true));
+  assert.ok(prop(false));
+  assert.ok(!prop('Use size instead.'), 'prop deprecated is boolean only');
+  assert.ok(!contract({ deprecated: true }), 'no component-level deprecation in the contract');
+});
+
+test('SCN-019: a prop block with deprecated is still a usable JSON Schema', () => {
+  const ajvProps = new Ajv2020({ strict: false });
+  assert.ok(ajvProps.validateSchema(deprecatedExample.props), 'deprecated: true is valid JSON Schema');
+  assert.ok(
+    !ajvProps.validateSchema({ properties: { dense: { type: 'boolean', deprecated: 'why' } } }),
+    'a string deprecated would make the prop block invalid JSON Schema',
+  );
+  const validateProps = ajvProps.compile(deprecatedExample.props);
+  assert.ok(validateProps({ label: 'New', dense: true }), 'a deprecated prop is still declared');
+  assert.ok(!validateProps({ label: 'New', compact: true }), 'an undeclared prop still fails');
 });

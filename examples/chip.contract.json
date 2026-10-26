@@ -1,0 +1,17 @@
+{
+  "$schema": "https://knapsack-oss.github.io/design-system-contract/schemas/v0/component.contract.schema.json",
+  "contractId": "chip",
+  "component": "Chip",
+  "description": "A compact label for a filter, tag, or choice.",
+  "props": {
+    "properties": {
+      "label":   { "type": "string", "description": "Visible text" },
+      "variant": { "type": "string", "enum": ["neutral", "brand"], "default": "neutral" },
+      "size":    { "type": "string", "enum": ["sm", "md"], "default": "md" },
+      "tone":    { "type": "string", "enum": ["info", "warning"], "deprecated": true, "description": "Use variant instead." },
+      "dense":   { "type": "boolean", "deprecated": true, "description": "Use size sm instead." }
+    },
+    "required": ["label"],
+    "additionalProperties": false
+  }
+}
