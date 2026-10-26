@@ -11,6 +11,11 @@
       "path": "chip.contract.json",
       "address": "sha256:4a946d52be91aeacf80e9926eed0dc59a871e10d6212a5e1eccaeb90052e4e94",
       "origin": "synced"
+    },
+    {
+      "path": "icon-badge.contract.json",
+      "address": "sha256:a749365bf53b68c38b996a9f415aa8ccdc36bfe00c18471b570135c285a1c754",
+      "origin": "inferred"
     }
   ]
 }

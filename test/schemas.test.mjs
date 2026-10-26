@@ -18,6 +18,7 @@ const validateManifest = ajv.compile(load('schemas/manifest.schema.json'));
 
 const example = load('examples/button-primary.contract.json');
 const deprecatedExample = load('examples/chip.contract.json');
+const exportsExample = load('examples/icon-badge.contract.json');
 const manifest = load('examples/manifest.json');
 const minimal = { contractId: 'button-primary', component: 'Button Primary' };
 const contract = (extra) => validateContract({ ...clone(minimal), ...extra });
@@ -30,6 +31,7 @@ const address = (doc) =>
 test('examples validate', () => {
   assert.ok(validateContract(example), JSON.stringify(validateContract.errors));
   assert.ok(validateContract(deprecatedExample), JSON.stringify(validateContract.errors));
+  assert.ok(validateContract(exportsExample), JSON.stringify(validateContract.errors));
   assert.ok(validateManifest(manifest), JSON.stringify(validateManifest.errors));
 });
 
@@ -114,4 +116,30 @@ test('SCN-019: a prop block with deprecated is still a usable JSON Schema', () =
   const validateProps = ajvProps.compile(deprecatedExample.props);
   assert.ok(validateProps({ label: 'New', dense: true }), 'a deprecated prop is still declared');
   assert.ok(!validateProps({ label: 'New', compact: true }), 'an undeclared prop still fails');
+});
+
+test('SCN-020: export records by kind', () => {
+  const js = { kind: 'js', name: 'Button', specifier: '@acme/ui' };
+  const tag = { kind: 'custom-element', tagName: 'acme-button' };
+  const sel = { kind: 'angular-selector', selector: 'button[acme-button], a[acme-button]' };
+  assert.ok(contract({ exports: [js] }));
+  assert.ok(contract({ exports: [js, tag] }), 'a custom element: module plus tag');
+  assert.ok(contract({ exports: [js, sel] }), 'an Angular component: import plus selector');
+  assert.ok(contract({ exports: [{ ...js, name: 'default', specifier: '@acme/ui/button' }] }), 'default export');
+  assert.ok(!contract({ exports: [] }), 'at least one record');
+  assert.ok(!contract({ exports: [js, { ...js }] }), 'records unique');
+  assert.ok(!contract({ exports: [{ name: 'Button', specifier: '@acme/ui' }] }), 'kind required');
+  assert.ok(!contract({ exports: [{ kind: 'swift', name: 'Button', module: 'AcmeUI' }] }), 'unknown kind rejected');
+  assert.ok(!contract({ exports: [{ ...js, name: '*' }] }), 'no aggregate export');
+  assert.ok(!contract({ exports: [{ ...js, package: '@acme/ui' }] }), 'js record closed');
+  assert.ok(!contract({ exports: [{ kind: 'js', name: 'Button' }] }), 'specifier required');
+  assert.ok(!contract({ exports: [{ ...tag, tagName: 'button' }] }), 'tag needs a hyphen');
+  assert.ok(!contract({ exports: [{ ...tag, tagName: 'Acme-Button' }] }), 'tag is lowercase');
+  assert.ok(!contract({ exports: [{ ...sel, selector: '' }] }), 'selector non-empty');
+});
+
+test('SCN-020: identity comes from the declared name, not an export record', () => {
+  assert.equal(exportsExample.contractId, 'iconbadge', 'fold of the declared name IconBadge');
+  assert.ok(exportsExample.exports.some((r) => r.name === 'default'), 'a default export does not rename the contract');
+  assert.ok(exportsExample.exports.some((r) => r.name === 'StatusBadge'), 'an alias is one more record, not one more contract');
 });

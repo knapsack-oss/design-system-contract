@@ -1,0 +1,17 @@
+{
+  "$schema": "https://knapsack-oss.github.io/design-system-contract/schemas/v0/component.contract.schema.json",
+  "contractId": "iconbadge",
+  "component": "Icon Badge",
+  "description": "A small status indicator with an icon.",
+  "exports": [
+    { "kind": "js", "name": "IconBadge", "specifier": "@acme/ui" },
+    { "kind": "js", "name": "StatusBadge", "specifier": "@acme/ui" },
+    { "kind": "js", "name": "default", "specifier": "@acme/ui/icon-badge" }
+  ],
+  "props": {
+    "properties": {
+      "tone": { "type": "string", "enum": ["info", "success", "warning"], "default": "info" }
+    },
+    "additionalProperties": true
+  }
+}
