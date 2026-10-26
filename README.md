@@ -45,6 +45,9 @@ Licensed [Apache-2.0](LICENSE).
 - **Variants are enum props.** There is no separate variants block. A prop named `variant` with an
   `enum` is a variant axis, and so is `size`, `tone`, or anything else with an `enum`.
 - **`slots`** and **`states`** are optional.
+- **`deprecated: true`** on a prop (JSON Schema's own keyword) marks a prop that still works but
+  shouldn't be used in new code. Say what replaces it in the prop's `description`. Whether a whole
+  component is deprecated is recorded in its DSDS entry, not in the contract.
 - **`cemRef`** and **`shadcnRef`** (optional) point at the same component's entry in a
   [Custom Elements Manifest](https://github.com/webcomponents/custom-elements-manifest) or a
   [shadcn registry](https://ui.shadcn.com). They are identifiers only; the contract doesn't copy

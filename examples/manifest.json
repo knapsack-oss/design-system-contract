@@ -6,6 +6,11 @@
       "path": "button-primary.contract.json",
       "address": "sha256:b11ac43d1cf8120534e96ec2d90c24a4c2d9b20364fe01e27632ee7ad63b7dd4",
       "origin": "synced"
+    },
+    {
+      "path": "chip.contract.json",
+      "address": "sha256:eb3b645c0e2ad8b2326961f537764425410c1b69b4db4f79ec2665d48a9184d6",
+      "origin": "synced"
     }
   ]
 }
