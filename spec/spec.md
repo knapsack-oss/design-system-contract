@@ -31,8 +31,9 @@ is a separate concern and is listed under Future directions, not specified here.
 **In scope**
 
 - The **component contract**: `contractId`, `component`, `description`, typed
-  `props` expressed as JSON Schema 2020-12, optional `slots` and `states`, and
-  optional `cemRef` / `shadcnRef` identifiers.
+  `props` expressed as JSON Schema 2020-12 (each optionally marked
+  `deprecated`), optional `slots` and `states`, and optional `cemRef` /
+  `shadcnRef` identifiers.
 - The **manifest**: `contractVersion` and the list of component-contract
   artifacts with their paths, content addresses, and origin.
 - The published **JSON Schemas** (Draft 2020-12) for both classes, validatable
@@ -324,6 +325,32 @@ following `href` reaches a contract whose `contractId` equals the entry's `id`
 **Derived requirements:** SR-139, SR-140, SR-141
 **Covered by:** mapping-pending
 
+### SCN-019: Publisher marks a prop as deprecated
+
+**Given** a `Chip` whose `dense` prop still works but has been replaced by
+`size: sm`, and whose `tone` enum prop is being retired in favor of `variant`
+**When** the publisher writes `"deprecated": true` on both props
+**Then** the contract validates, a consumer can tell a deprecated prop from an
+undeclared one, and the prop block stays a usable JSON Schema
+
+**Acceptance criteria:**
+
+- A prop's `deprecated` validates as a boolean; a string fails at that prop's
+  `deprecated`. The prop block still compiles with a stock 2020-12 validator,
+  which reads `deprecated` as its own annotation.
+- A contract with no `deprecated` validates, and means no prop is deprecated.
+- A deprecated prop is still declared: a usage that supplies it is a usage of a
+  declared prop that is deprecated, not of an undeclared one.
+- A consumer projecting onto DSDS gives the `tone` trait (an enum prop) a
+  `deprecated` status. `dense` (a boolean prop) becomes a trait the same way.
+  A deprecated prop of any other type has no trait and stays in the contract.
+- The contract has no component-level deprecation. A deprecated component is
+  recorded on its DSDS component entry's `metadata.status`.
+- A deprecated value inside an `enum` is not expressible in this version.
+
+**Derived requirements:** SR-125, SR-144, SR-145
+**Covered by:** mapping-pending
+
 ---
 
 ## The fold (normative)
@@ -370,6 +397,7 @@ Appendix A.
 | entry in `states` | `traitType: state`, `kind: boolean` | a state is present or absent |
 | prop with any other type | no trait | DSDS traits do not model free-form props; the contract is the record |
 | cross-prop rules | not in v0.1 | DSDS `combos` is the prior art for v0.2, ahead of cva `compoundVariants` (D-80) |
+| prop with `deprecated: true` | the prop's trait, if it has one, gets status `deprecated`; `description` becomes `deprecationNotice` | a deprecated prop with no trait stays in the contract only. DSDS requires a notice on a deprecated status; a prop with no `description` gives the consumer none to carry, and the consumer records that (D-82) |
 
 The trait's name is the prop or state name, unchanged.
 
@@ -389,7 +417,7 @@ tagged in the trailing comment.
 - SR-122: The schema shall constrain `contractId` to the pattern `^[a-z0-9]+(-[a-z0-9]+)*$`.   # ← SCN-010, SCN-014 (D-75, D-79)
 - SR-123: A publisher shall carry `component` as the design system's own display name, verbatim, and shall not fold it, derive it from `contractId`, or require it to equal `contractId`.   # ← SCN-010 (D-75)
 - SR-124: The schema shall express `props` as a JSON Schema 2020-12 object schema whose permitted members are exactly `properties`, `required`, and `additionalProperties`, with `additionalProperties` a required boolean whenever `props` is present.   # ← SCN-011, SCN-012 (D-71)
-- SR-125: The schema shall require `type` in each `props.properties` entry and shall permit exactly the members `type`, `default`, `description`, and `enum`, with `type` restricted to the 2020-12 type names or an array of them.   # ← SCN-011 (D-71) · amended v0.11.0 (D-81)
+- SR-125: The schema shall require `type` in each `props.properties` entry and shall permit exactly the members `type`, `default`, `description`, `enum`, and `deprecated`, with `type` restricted to the 2020-12 type names or an array of them and `deprecated` a boolean.   # ← SCN-011, SCN-019 (D-71) · amended v0.11.0 (D-81) · amended (D-82)
 - SR-126: If `props.required` names a prop that is not a key of `props.properties`, then a publisher shall fail the publish naming that prop, reporting it together with every other publish-time finding rather than stopping at the first.   # ← SCN-011 · amended v0.11.0 (D-81)
 - SR-127: If a prop carries both `enum` and `default` and the default is not one of the enum values, then a publisher shall fail the publish naming that prop, reporting it together with every other publish-time finding rather than stopping at the first.   # ← SCN-011 · amended v0.11.0 (D-81)
 - SR-128: The schema shall declare no `variants` member; a prop of any name, including `variant`, whose schema carries `enum` is a variant axis.   # ← SCN-011 (D-73)
@@ -408,6 +436,8 @@ tagged in the trailing comment.
 - SR-139: When a consumer projects a prop carrying `enum` onto DSDS traits, the consumer shall emit a trait of that prop's name with `traitType: variant`, `kind: enum`, and `values` ordered default-first then declared order.   # ← SCN-018 (D-80)
 - SR-140: When a consumer projects a prop of `type: boolean` onto DSDS traits, the consumer shall emit a trait of that prop's name with `traitType: variant` and `kind: boolean`.   # ← SCN-018 (D-80)
 - SR-141: When a consumer projects `states` onto DSDS traits, the consumer shall emit for each state a trait of that name with `traitType: state` and `kind: boolean`.   # ← SCN-018 (D-80)
+- SR-144: Where a prop's `deprecated` is `true`, a consumer shall treat that prop as declared and deprecated; where `deprecated` is absent or `false`, the consumer shall treat it as not deprecated.   # ← SCN-019 (D-82)
+- SR-145: When a consumer projects a deprecated prop onto a DSDS trait under SR-139 or SR-140, the consumer shall give that trait the status `deprecated`, carrying the prop's `description`, if any, as the trait's `deprecationNotice`.   # ← SCN-019 (D-82)
 
 ### Non-functional requirements
 
@@ -435,6 +465,7 @@ tagged in the trailing comment.
 | SCN-016 | SR-134, SR-135, SR-006, SR-136, SR-137, SR-133 | slim manifest (D-77); `authored` deferred (D-78); INV-5 in SR form; manifest-level `contractId` uniqueness is SR-133's obligation, not a separate SR (D-81) |
 | SCN-017 | SR-138 | DSDS `specs` pointer (D-76); `contractId` SHOULD equal DSDS `id` is guidance, not an SR |
 | SCN-018 | SR-139, SR-140, SR-141 | DSDS trait mapping (D-80) |
+| SCN-019 | SR-125, SR-144, SR-145 | prop `deprecated` is JSON Schema's own boolean annotation; a trait's deprecated status is derived from it; component deprecation lives in DSDS only (D-82) |
 | — | SR-103, SR-104 | schema validatability with stock tooling; key-space closure |
 | — | SR-105, SR-106 | open licensing posture |
 | — | SR-107, SR-108 | composition with prior art |
@@ -477,7 +508,7 @@ destination); a thin agent index (`AGENTS.md`); an append-only provenance log;
 signing and attestation, including manifest-level and per-artifact `signer` /
 `signature` slots, a per-artifact `ratified` state, and a `canonicalForm`
 cache (D-77); the origin value `authored` (D-78); richer per-prop JSON Schema
-keywords; cross-prop rules composing with DSDS `combos`; collision detection
+keywords; deprecation of a single enum value (D-82); cross-prop rules composing with DSDS `combos`; collision detection
 against previously published manifests (D-81); a deterministic checker that
 never calls a model; and a CI action. None of these is specified here and none
 is promised.
@@ -519,6 +550,10 @@ is promised.
 - **slot** — a named insertion point, as a bare name or a record with `name`,
   `description`, `a11y` (`role`, `nameFrom`, `required`).
 - **state** — a named condition the component can be in, as a non-empty string.
+- **deprecated prop** — still declared and still accepted, but new usages should
+  not supply it. Marked with JSON Schema's boolean `deprecated` annotation.
+  Removal is a separate event: a removed prop is undeclared. Component
+  deprecation is not a contract concept; it is a DSDS entry status (D-82).
 - **manifest** — `manifest.json`: `contractVersion` plus one artifact record per
   component contract.
 - **artifact record** — `{ path, address, origin }`; `path` relative to the
@@ -719,3 +754,40 @@ amendments rather than accepting any as an ambiguity. Ruled by Robin on
   become invalid; a consumer wanting collision detection against last month's
   manifest builds it outside this specification. No spelling pinned beyond
   members the schema already names; no invariant changed.
+
+
+### D-82 — prop deprecation
+
+- **D-82 — a prop can be marked deprecated; a component cannot.** *What:* an
+  optional boolean `deprecated` on each prop (SR-125), meaning "declared, still
+  accepted, stop using it" (SR-144). A deprecated enum or boolean prop's DSDS
+  trait takes the status `deprecated`, derived from the contract (SR-145). The
+  contract gains no component-level marker. *Prior art:* JSON Schema 2020-12
+  defines `deprecated` as a boolean annotation in its meta-data vocabulary;
+  because `props` is a JSON Schema, the marker is that keyword, unchanged, and a
+  prop block stays compilable by any stock validator. The Custom Elements
+  Manifest marks attributes and properties with `deprecated: boolean | string`
+  and DTCG marks tokens with `$deprecated: boolean | string`; both confirm the
+  name. DSDS models lifecycle as a `status` on entries, traits, and trait
+  values, with a required `deprecationNotice` and an optional `replacedBy`.
+  Southleft's `ds-contracts-poc`
+  carries `status: draft | stable | deprecated` on a component; the same need is
+  met here by DSDS, which already holds component lifecycle. The shadcn registry has no equivalent. *Why:* without it, a
+  contract can say a prop is declared or not, but not "declared, being phased
+  out". A tool reading the contract either keeps recommending the old prop or,
+  if the prop is dropped, reports every working usage as invalid. *Why one
+  home per fact:* a design system author who can mark the same thing deprecated
+  in two files will, sooner or later, mark it in one and not the other, and
+  every reader then has to decide which file wins. A component's lifecycle is
+  already a DSDS entry status, so the contract does not restate it (INV-4). A
+  prop's deprecation has no DSDS home unless the prop becomes a trait, and
+  traits are already projected from the contract (D-80), so the contract is
+  where it is written and the trait status follows from it. *Not included:* a
+  reason string on a prop (JSON Schema's keyword is boolean, and a string would
+  make the prop block an invalid JSON Schema; the reason goes in
+  `description`); deprecating one value of an `enum`; a successor pointer, which
+  DSDS offers as `replacedBy`. *Cost:* one optional prop member. The prop
+  object is closed (SR-104), so a validator holding the v0.1 schema rejects a
+  contract that uses it; publishers and consumers move to the schema that
+  carries it together. A consumer that ignores the marker loses nothing it had
+  before.

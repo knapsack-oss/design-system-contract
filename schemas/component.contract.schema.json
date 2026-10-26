@@ -100,6 +100,10 @@
         "enum": {
           "description": "The allowed values. A prop carrying enum is a variant axis.",
           "type": "array"
+        },
+        "deprecated": {
+          "description": "JSON Schema 2020-12's own deprecated annotation, carried as-is: true means a usage should stop supplying this prop. Say why or what replaces it in description.",
+          "type": "boolean"
         }
       }
     },
