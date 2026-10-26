@@ -45,6 +45,10 @@ Licensed [Apache-2.0](LICENSE).
 - **Variants are enum props.** There is no separate variants block. A prop named `variant` with an
   `enum` is a variant axis, and so is `size`, `tone`, or anything else with an `enum`.
 - **`slots`** and **`states`** are optional.
+- **`exports`** (optional) says how code refers to the component, one record per way:
+  `{ "kind": "js", "name": "Button", "specifier": "@acme/ui" }`, a custom element
+  `tagName`, or an Angular `selector`. A tool matches a usage in product code against these
+  exactly, so it finds the right contract whatever the display name is.
 - **`cemRef`** and **`shadcnRef`** (optional) point at the same component's entry in a
   [Custom Elements Manifest](https://github.com/webcomponents/custom-elements-manifest) or a
   [shadcn registry](https://ui.shadcn.com). They are identifiers only; the contract doesn't copy

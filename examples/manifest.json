@@ -6,6 +6,11 @@
       "path": "button-primary.contract.json",
       "address": "sha256:b11ac43d1cf8120534e96ec2d90c24a4c2d9b20364fe01e27632ee7ad63b7dd4",
       "origin": "synced"
+    },
+    {
+      "path": "icon-badge.contract.json",
+      "address": "sha256:a749365bf53b68c38b996a9f415aa8ccdc36bfe00c18471b570135c285a1c754",
+      "origin": "inferred"
     }
   ]
 }

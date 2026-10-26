@@ -31,8 +31,9 @@ is a separate concern and is listed under Future directions, not specified here.
 **In scope**
 
 - The **component contract**: `contractId`, `component`, `description`, typed
-  `props` expressed as JSON Schema 2020-12, optional `slots` and `states`, and
-  optional `cemRef` / `shadcnRef` identifiers.
+  `props` expressed as JSON Schema 2020-12, optional `slots` and `states`,
+  optional `exports` saying how code refers to the component, and optional
+  `cemRef` / `shadcnRef` identifiers.
 - The **manifest**: `contractVersion` and the list of component-contract
   artifacts with their paths, content addresses, and origin.
 - The published **JSON Schemas** (Draft 2020-12) for both classes, validatable
@@ -324,6 +325,41 @@ following `href` reaches a contract whose `contractId` equals the entry's `id`
 **Derived requirements:** SR-139, SR-140, SR-141
 **Covered by:** mapping-pending
 
+### SCN-020: Publisher says how code refers to a component
+
+**Given** a component declared as `IconBadge`, displayed as `Icon Badge`,
+importable from `@acme/ui` and from `@acme/ui/icon-badge` (as its default
+export), and also re-exported from `@acme/ui` as `StatusBadge`
+**When** the publisher writes one `exports` record per way code refers to it
+**Then** the contract validates, its `contractId` is `iconbadge` (the fold of the
+declared name, Appendix A), and a consumer binds each of these usages to it by
+exact key, with no guessing from names:
+`import { IconBadge } from '@acme/ui'`,
+`import { IconBadge as Badge } from '@acme/ui'`,
+`import Badge from '@acme/ui/icon-badge'`, and
+`import { StatusBadge } from '@acme/ui'`
+
+**Acceptance criteria:**
+
+- `exports` is optional; a contract without it validates and cannot be bound
+  to code by this mechanism.
+- Each record carries a `kind`. This version defines three: `js`
+  (`name`, `specifier`), `custom-element` (`tagName`), and `angular-selector`
+  (`selector`). A record of any other kind, or with a member outside its kind's
+  members, fails validation.
+- One contract may carry several records and several kinds: an Angular
+  component carries its `js` import and its `angular-selector`; a custom
+  element carries its `js` module and its `custom-element` tag.
+- A `js` record names one exact module specifier. A component importable from
+  a package root and from a subpath has one record for each. A default export
+  is `name: "default"`; `name: "*"` fails.
+- A local alias in the consuming file does not change the key: the imported
+  export name is matched, not the local name.
+- Two contracts in one manifest carrying the same key fail the publish.
+
+**Derived requirements:** SR-147, SR-148, SR-149, SR-150, SR-151
+**Covered by:** mapping-pending
+
 ---
 
 ## The fold (normative)
@@ -408,6 +444,11 @@ tagged in the trailing comment.
 - SR-139: When a consumer projects a prop carrying `enum` onto DSDS traits, the consumer shall emit a trait of that prop's name with `traitType: variant`, `kind: enum`, and `values` ordered default-first then declared order.   # ← SCN-018 (D-80)
 - SR-140: When a consumer projects a prop of `type: boolean` onto DSDS traits, the consumer shall emit a trait of that prop's name with `traitType: variant` and `kind: boolean`.   # ← SCN-018 (D-80)
 - SR-141: When a consumer projects `states` onto DSDS traits, the consumer shall emit for each state a trait of that name with `traitType: state` and `kind: boolean`.   # ← SCN-018 (D-80)
+- SR-147: The schema shall permit an optional root `exports` array of at least one unique record, each record a `js`, `custom-element`, or `angular-selector` record with exactly the members Appendix B gives that kind, and shall reject a record of any other kind.   # ← SCN-020 (D-83)
+- SR-148: Where a component contract carries `exports`, a consumer shall bind a usage to that contract only when the usage's key equals a record's key under the matching rule Appendix B gives that record's kind, and shall not bind by `component` or `contractId` alone.   # ← SCN-020 (D-83)
+- SR-149: If two or more contracts contributing to one manifest carry the same key, then a publisher shall fail the publish naming the key and every contract that carries it, reported together with every other publish-time finding rather than stopping at the first.   # ← SCN-020 (D-83, D-81)
+- SR-150: When a publisher derives `contractId` from an npm package, the publisher shall fold the component's declared name as Appendix A's npm profile defines it, and shall not derive it from any `exports` record.   # ← SCN-020 (D-83)
+- SR-151: A consumer shall keep apart a usage that resolves to a configured design system's module but matches no record (unbound) and a usage that resolves to a module outside every configured design system (outside the system), and shall report the first with the reason it did not bind.   # ← SCN-020 (D-83)
 
 ### Non-functional requirements
 
@@ -435,6 +476,7 @@ tagged in the trailing comment.
 | SCN-016 | SR-134, SR-135, SR-006, SR-136, SR-137, SR-133 | slim manifest (D-77); `authored` deferred (D-78); INV-5 in SR form; manifest-level `contractId` uniqueness is SR-133's obligation, not a separate SR (D-81) |
 | SCN-017 | SR-138 | DSDS `specs` pointer (D-76); `contractId` SHOULD equal DSDS `id` is guidance, not an SR |
 | SCN-018 | SR-139, SR-140, SR-141 | DSDS trait mapping (D-80) |
+| SCN-020 | SR-147, SR-148, SR-149, SR-150, SR-151 | code binding by kind (Appendix B); exact keys; identity from the declared name, never from a binding (Appendix A); unbound kept apart from outside the system (D-83) |
 | — | SR-103, SR-104 | schema validatability with stock tooling; key-space closure |
 | — | SR-105, SR-106 | open licensing posture |
 | — | SR-107, SR-108 | composition with prior art |
@@ -498,6 +540,14 @@ is promised.
   D-81).
 - **declared name** — the name a publisher's source gives a component; the input
   to the fold. What counts as the declared name per source kind is Appendix A.
+- **export record** — one entry in `exports`: one way code refers to the
+  component, as a `kind` plus that kind's key. A contract may carry several
+  (D-83).
+- **binding** — the link a consumer makes from a usage in code to the contract
+  that governs it, by matching the usage's key against export records.
+- **unbound** — a usage that resolves to a configured design system's module
+  but matches no export record. Not the same as a usage from outside every
+  configured design system (D-83).
 - **fold** — the five-step derivation from declared name to `contractId`, with
   two rejection classes and collision as hard failure.
 - **residual character** — a character remaining after the fold that is outside
@@ -559,8 +609,43 @@ which source identifier it folds (for example a React export name, a Custom
 Elements Manifest `tagName`, or a design-tool component name) in its own
 documentation. A publisher SHOULD fold the same source identifier for a
 component on every publish, so that a component's `contractId` is stable across
-publishes (D-81). Profiles are a v0.2 candidate; the fold itself does not change
-with the profile.
+publishes (D-81). The fold itself does not change with the profile.
+
+### Profile: npm package, component unit (D-83)
+
+- **Unit:** one component declaration in the package's published type
+  declarations, however many ways it is exported.
+- **Declared name:** the declaration's own written name: its class or function
+  name, exactly as written in the declaration file. Where a Custom Elements
+  Manifest describes it, the manifest declaration's `name` (the class name).
+- **Not read:** export names, including `default` and renamed exports; a
+  custom element's `tagName`. These are export records (Appendix B), not
+  identity.
+- **Merging:** two exports of one declaration are one unit with two export
+  records, never two contracts.
+- **Rejection:** a declaration with no written name, such as an anonymous
+  default export, is rejected as unnormalizable; the publisher names it.
+
+---
+
+## Appendix B — Export record kinds (D-83)
+
+Each kind answers six questions, so two tools reading the same contract bind
+the same usages. A new kind is added by answering the same six.
+
+| Question | `js` | `custom-element` | `angular-selector` |
+|---|---|---|---|
+| Reference form: how usage code names the component | an import of a named or default export | a tag in HTML, JSX, or a template | an element or attribute in an Angular template |
+| Key members | `name`, `specifier` | `tagName` | `selector` |
+| Normalization | none; both compared exactly. A local alias is resolved to the imported name first | a usage's tag name is ASCII-lowercased, as HTML parsing does | none; the selector is used as written |
+| Matching rule | the import's specifier equals `specifier` and its imported export name equals `name`; a namespace import's member access counts as importing that member | the lowercased tag equals `tagName` | Angular's own selector matching against the element |
+| Scope | modules the consuming project depends on | the page's custom element registry; a tag names one element per page | components the template's module or standalone `imports` bring in |
+| Prior-art name | the ECMAScript module specifier; the Custom Elements Manifest's export `name` | the Custom Elements Manifest's `tagName` | Angular's `selector` |
+
+Considered for later kinds, not defined here: Swift (`name` plus `module`),
+Svelte and Vue single-file components (covered by `js` when imported; Vue
+global registration is name-based), and scoped custom element registries,
+whose local tags a scanner resolves back to the `js` record.
 
 ---
 
@@ -719,3 +804,43 @@ amendments rather than accepting any as an ambiguity. Ruled by Robin on
   become invalid; a consumer wanting collision detection against last month's
   manifest builds it outside this specification. No spelling pinned beyond
   members the schema already names; no invariant changed.
+
+
+### D-83 — export records
+
+- **D-83 — a contract can say how code refers to its component.** *What:* an
+  optional root `exports` of typed records (SR-147), three kinds in this
+  version (Appendix B). A consumer binds a usage only by exact key (SR-148); a
+  publisher fails a publish where two contracts claim one key (SR-149). For an
+  npm source, `contractId` comes from the declared name, never from an export
+  record (SR-150, Appendix A). Unbound usages are kept apart from usages
+  outside the system (SR-151). *Why:* D-75 separated identity from display
+  name and deferred how a checker binds a usage to a contract. Without a
+  binding, a tool that reads `<Button variant="hero">` cannot know which
+  contract governs `Button`: the display name may differ, the fold loses case,
+  two packages can each export a `Button`, templates name components by tag or
+  selector, and one component is often exported under several names. Tools
+  then match by name and are quietly wrong, or skip component checks.
+  *Why keys, not names:* each record is the exact thing a usage carries, so
+  matching is equality, and both precision and recall are measurable against
+  labeled usages. *Why identity stays separate:* `contractId` must stay a
+  lowercase DSDS-compatible id (D-75, D-79), and export names vary and can be
+  reordered; deriving identity from the declaration gives one source however a
+  component is exported. *Prior art:* the Custom Elements Manifest records
+  exports by `name` and custom elements by `tagName`; ECMAScript calls the
+  import string a module specifier; Angular calls its template key a
+  `selector`. DSDS 0.23 puts `imports[{ platform, code, package }]` on a
+  component entry; `code` is an import statement written for people, and
+  there is no structured export name. Southleft's `ds-contracts-poc`
+  pairs the same two facts in `bindings.code.anchors { importPath, export }`,
+  one per contract, pointing at the component's source in the design system's
+  repository; that links a contract to its own source. This proposal serves
+  the other direction, tools reading product code, so it records the
+  published specifiers that code imports and allows several records per
+  contract. The two compose. *Not included:* Swift, Vue global
+  names, and other kinds (Appendix B lists candidates); an extension point for
+  unknown kinds (each new kind is a schema change until the format reaches
+  1.0); a platform field (D-75). *Cost:* one optional member and a publish-time
+  check. The root is closed (SR-104), so a validator holding the v0.1 schema
+  rejects a contract that uses `exports`; publishers and consumers move to the
+  schema that carries it together.

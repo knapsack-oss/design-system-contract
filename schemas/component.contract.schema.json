@@ -26,6 +26,13 @@
       "description": "Human-readable summary of the component.",
       "type": "string"
     },
+    "exports": {
+      "description": "How code refers to this component: one record per way, so a tool can tell which usages this contract governs. Kinds are defined in the specification's Appendix B.",
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/exportRecord" }
+    },
     "cemRef": {
       "description": "Custom Elements Manifest identifier for this component. Carried as an identifier only; the manifest entry's shape is not restated here.",
       "type": "string",
@@ -49,6 +56,62 @@
     }
   },
   "$defs": {
+    "exportRecord": {
+      "description": "One way code refers to the component. kind selects the record's shape.",
+      "oneOf": [
+        { "$ref": "#/$defs/jsExport" },
+        { "$ref": "#/$defs/customElementExport" },
+        { "$ref": "#/$defs/angularSelectorExport" }
+      ]
+    },
+    "jsExport": {
+      "description": "A JavaScript export: the name a consumer imports and the exact module specifier it imports it from.",
+      "type": "object",
+      "required": ["kind", "name", "specifier"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "js" },
+        "name": {
+          "description": "The exported name: the named export, or \"default\" for a default export. Not an aggregate (\"*\").",
+          "type": "string",
+          "minLength": 1,
+          "not": { "const": "*" }
+        },
+        "specifier": {
+          "description": "The module specifier exactly as a consumer writes it in an import, for example \"@acme/ui\" or \"@acme/ui/button\". One record per entry point.",
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "customElementExport": {
+      "description": "A custom element tag name, as the Custom Elements Manifest records it.",
+      "type": "object",
+      "required": ["kind", "tagName"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "custom-element" },
+        "tagName": {
+          "description": "A valid custom element name: lowercase, beginning with a letter, containing a hyphen.",
+          "type": "string",
+          "pattern": "^[a-z][^A-Z\\s]*-[^A-Z\\s]*$"
+        }
+      }
+    },
+    "angularSelectorExport": {
+      "description": "An Angular component or directive selector, verbatim as declared.",
+      "type": "object",
+      "required": ["kind", "selector"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": "angular-selector" },
+        "selector": {
+          "description": "The selector string exactly as the component declares it, for example \"acme-button\" or \"button[acme-button], a[acme-button]\".",
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
     "props": {
       "description": "The component's props, written as a JSON Schema 2020-12 object schema, so a stock validator can check a prop bag against it directly. Optional: a contract that omits props declares an empty, closed prop set. When props is present, additionalProperties is required and states whether undeclared props are allowed. An enum-typed prop is a variant axis; there is no separate variants member.",
       "type": "object",
