@@ -436,6 +436,25 @@ consulting any other file
 **Derived requirements:** SR-129, SR-155, SR-156, SR-157
 **Covered by:** mapping-pending
 
+### SCN-023: A manifest cannot point outside its own directory
+
+**Given** a manifest received from a source a consumer does not control
+**When** a record's `path` is `../../etc/passwd`, `/etc/passwd`, or
+`https://example.com/x.json`
+**Then** the manifest fails validation at that `path`, so no consumer following
+the manifest reads outside the manifest's directory or reaches the network
+
+**Acceptance criteria:**
+
+- `components/button.contract.json` and `button.contract.json` pass.
+- A path with a `.` or `..` segment, a leading slash, an empty segment, a trailing
+  slash, a colon, a backslash, or a control character fails.
+- A consumer uses `path` as written. `%2e%2e/a.json` passes validation and names
+  a directory literally called `%2e%2e`.
+
+**Derived requirements:** SR-158, SR-159
+**Covered by:** mapping-pending
+
 ---
 
 ## The fold (normative)
@@ -532,6 +551,8 @@ tagged in the trailing comment.
 - SR-155: The schema shall permit on a slot record the optional members `minChildren` (an integer of at least 0), `maxChildren` (an integer of at least 1), `accepts` (unique strings matching the `contractId` pattern), and `allowsText` (a boolean), and shall reject a record whose `accepts` is empty and whose `allowsText` is `false`.   # ← SCN-022 (D-85)
 - SR-156: If a slot's `minChildren` exceeds its `maxChildren`, or a slot's `accepts` names a `contractId` absent from the manifest, then a publisher shall fail the publish naming the slot, reporting it together with every other publish-time finding rather than stopping at the first.   # ← SCN-022 (D-85, D-81)
 - SR-157: A consumer shall read a slot's absent `minChildren` as 0, absent `maxChildren` as no limit, absent `accepts` as any component, absent `allowsText` as `true`, and `a11y.required` as requiring the slot's content to give the component an accessible name.   # ← SCN-022 (D-85)
+- SR-158: The schema shall constrain each artifact record's `path` to one or more forward-slash-separated segments, none of them `.` or `..`, and none containing a backslash, a colon, or a control character.   # ← SCN-023 (D-86)
+- SR-159: A consumer shall resolve `path` against the manifest's own directory as written, shall not percent-decode it, and shall not follow a symbolic link out of that directory.   # ← SCN-023 (D-86)
 
 ### Non-functional requirements
 
@@ -565,6 +586,7 @@ tagged in the trailing comment.
 | SCN-021 | SR-152, SR-153, SR-154 | a schema per version; no extension members; closed is the expected prop set (D-84) |
 | SCN-020 | SR-147, SR-148, SR-149, SR-150, SR-151 | code binding by kind (Appendix B); exact keys; identity from the declared name, never from a binding (Appendix A); unbound kept apart from outside the system (D-83) |
 | SCN-022 | SR-129, SR-155, SR-156, SR-157 | slot rules; one home per fact, so "required" is `minChildren: 1` (D-85) |
+| SCN-023 | SR-158, SR-159 | `path` stays inside the manifest's directory; supports SR-143's no-network rule (D-86) |
 | — | SR-103, SR-104 | schema validatability with stock tooling; key-space closure |
 | — | SR-105, SR-106 | open licensing posture |
 | — | SR-107, SR-108 | composition with prior art |
@@ -666,7 +688,7 @@ is promised.
 - **manifest** — `manifest.json`: `contractVersion` plus one artifact record per
   component contract.
 - **artifact record** — `{ path, address, origin }`; `path` relative to the
-  manifest's directory; `origin` is `inferred` (derived without owner
+  manifest's directory and never leaving it (D-86); `origin` is `inferred` (derived without owner
   confirmation) or `synced` (retrieved from the design system's source of truth).
 - **content address** — `sha256:<hex>` of an artifact's canonical form.
 - **canonical form** — the serialization of a JSON artifact over which its
@@ -1035,3 +1057,20 @@ records the ruling.
   its manifest's other contracts, so a slot cannot name a component from another
   design system. Southleft measured its own corpus and found `min` and `max` used
   on none of 48 slots, so cardinality may see little use from generated contracts.
+
+### D-86: manifest paths stay inside the manifest's directory
+
+Proposed on 2026-11-06 by Chris Strahl for the maintainer's ruling. The merge
+records the ruling.
+
+- **D-86: `path` cannot leave the manifest's directory.** *What:* a schema pattern
+  on `path` (SR-158) and a consumer rule for reading it (SR-159). *Why:* SR-136
+  said `path` is relative, but the schema accepted `../../etc/passwd`, an absolute
+  path, and a URL, and under D-74 the schema wins. A consumer following such a
+  manifest could read outside the design system's files, or make the network
+  request SR-143 forbids. A content address does not help, since the same manifest
+  supplies it. *Prior art:* this adds no member, so PROH-4's check does not apply; RFC 3986
+  names the dot segments. *Cost:* a publisher cannot list contracts stored above
+  the manifest, and must move the manifest up instead. The pattern rejects a colon
+  anywhere in a path, so a file name with a colon must be renamed. Symbolic links
+  are invisible to a schema, so SR-159 leaves them to the consumer.

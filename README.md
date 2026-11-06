@@ -96,8 +96,8 @@ Nothing is silently merged. The rule gives the same answer on every machine, in 
 }
 ```
 
-Each record gives a contract's location relative to the manifest, its content address, and where it
-came from: `synced` from the design system's source of truth, or `inferred` without the owner's
+Each record gives a contract's location inside the manifest's own directory (never `..`, an absolute
+path, or a URL), its content address, and where it came from: `synced` from the design system's source of truth, or `inferred` without the owner's
 confirmation. The address is `sha256:` plus the SHA-256 digest of the contract serialized per
 [RFC 8785](https://www.rfc-editor.org/rfc/rfc8785) (JSON Canonicalization Scheme), so reformatting
 a file doesn't change its address. Editing its content does.
