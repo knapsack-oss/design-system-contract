@@ -455,6 +455,26 @@ the manifest reads outside the manifest's directory or reaches the network
 **Derived requirements:** SR-158, SR-159
 **Covered by:** mapping-pending
 
+### SCN-024: A prop's values must fit its type
+
+**Given** a prop declared `{ "type": "boolean", "default": "yes" }`, or
+`{ "type": "boolean", "enum": ["a"] }`
+**When** a publisher or consumer validates the contract with a stock validator
+**Then** it fails validation at that prop, with no tool beyond the schema
+
+**Acceptance criteria:**
+
+- A `default` and every `enum` value must fit `type`. With an array of types, a
+  value must fit at least one of them.
+- `integer` accepts `2` and `2.0` and rejects `1.5`. `number` accepts all three.
+- `"enum": []` and `"enum": ["a", "a"]` fail validation.
+- A prop named `""` fails validation.
+- Whether `default` is one of the `enum` values stays a publish-time check
+  (SR-127): a stock schema cannot compare one value against another.
+
+**Derived requirements:** SR-160
+**Covered by:** mapping-pending
+
 ---
 
 ## The fold (normative)
@@ -553,6 +573,7 @@ tagged in the trailing comment.
 - SR-157: A consumer shall read a slot's absent `minChildren` as 0, absent `maxChildren` as no limit, absent `accepts` as any component, absent `allowsText` as `true`, and `a11y.required` as requiring the slot's content to give the component an accessible name.   # ← SCN-022 (D-85)
 - SR-158: The schema shall constrain each artifact record's `path` to one or more forward-slash-separated segments, none of them `.` or `..`, and none containing a backslash, a colon, or a control character.   # ← SCN-023 (D-86)
 - SR-159: A consumer shall resolve `path` against the manifest's own directory as written, shall not percent-decode it, and shall not follow a symbolic link out of that directory.   # ← SCN-023 (D-86)
+- SR-160: The schema shall reject a prop whose `default` or any `enum` value does not fit its `type`, a prop whose `enum` is empty or holds duplicates, and an empty prop name.   # ← SCN-024 (D-87)
 
 ### Non-functional requirements
 
@@ -587,6 +608,7 @@ tagged in the trailing comment.
 | SCN-020 | SR-147, SR-148, SR-149, SR-150, SR-151 | code binding by kind (Appendix B); exact keys; identity from the declared name, never from a binding (Appendix A); unbound kept apart from outside the system (D-83) |
 | SCN-022 | SR-129, SR-155, SR-156, SR-157 | slot rules; one home per fact, so "required" is `minChildren: 1` (D-85) |
 | SCN-023 | SR-158, SR-159 | `path` stays inside the manifest's directory; supports SR-143's no-network rule (D-86) |
+| SCN-024 | SR-160 | value checks a stock validator can run; default-in-enum stays with SR-127 (D-87) |
 | — | SR-103, SR-104 | schema validatability with stock tooling; key-space closure |
 | — | SR-105, SR-106 | open licensing posture |
 | — | SR-107, SR-108 | composition with prior art |
@@ -1074,3 +1096,20 @@ records the ruling.
   the manifest, and must move the manifest up instead. The pattern rejects a colon
   anywhere in a path, so a file name with a colon must be renamed. Symbolic links
   are invisible to a schema, so SR-159 leaves them to the consumer.
+
+### D-87: prop values fit their type
+
+Proposed on 2026-11-06 by Chris Strahl for the maintainer's ruling. The merge
+records the ruling.
+
+- **D-87: the schema checks `default` and `enum` against `type`.** *What:* seven
+  conditional branches on the prop schema, plus `minItems` and `uniqueItems` on
+  `enum` and a non-empty prop name (SR-160). *Why:* `{ "type": "boolean", "default":
+  "yes" }` validated, so a consumer told by a contract to fill in that default
+  would write a value of the wrong type. These checks fit in JSON Schema, so every
+  stock validator runs them and no tool is needed. *Prior art:* this adds no member.
+  JSON Schema 2020-12 recommends that a `default` be valid against its schema and
+  that `enum` have at least one element and no duplicates; this entry makes those
+  hard rules. *Cost:* existing contracts that break these rules become invalid under
+  v0.2. A validator's error points into the `allOf` branch, not at a plain message
+  about the prop. Default-in-enum stays a publish-time check.
