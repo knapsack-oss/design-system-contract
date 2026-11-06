@@ -45,7 +45,9 @@ Licensed [Apache-2.0](LICENSE).
   with no `props` member takes no props.
 - **Variants are enum props.** There is no separate variants block. A prop named `variant` with an
   `enum` is a variant axis, and so is `size`, `tone`, or anything else with an `enum`.
-- **`slots`** and **`states`** are optional.
+- **`slots`** and **`states`** are optional. A slot record can also state what fills it: `minChildren`
+  (1 makes it required), `maxChildren` (1 means only one), `accepts` (the `contractId`s of the only
+  components allowed), and `allowsText`.
 - **`deprecated: true`** on a prop (JSON Schema's own keyword) marks a prop that still works but
   shouldn't be used in new code. Say what replaces it in the prop's `description`. Whether a whole
   component is deprecated is recorded in its DSDS entry, not in the contract.
@@ -155,14 +157,13 @@ changing.
 
 - **Some publish-time checks live only in the specification.** The spec says a publisher must fail
   when `required` names an undeclared prop, a `default` isn't one of its `enum` values, a name folds
-  to nothing, or two names fold to the same `contractId`. JSON Schema can't express these, and v0.1
+  to nothing, two names fold to the same `contractId`, a slot's `minChildren` exceeds its
+  `maxChildren`, or `accepts` names a `contractId` the manifest doesn't have. JSON Schema can't express these, and v0.1
   ships no tool that runs them. A schema validator alone won't catch them.
 - **`enum` can be empty.** The schema accepts `"enum": []`, which describes a prop with no allowed
   values.
 - **Prop names are unconstrained.** Any key is accepted under `props.properties`, including `""`.
 - **`contractVersion` is free text.** It must be non-empty but doesn't have to be a semantic version.
-- **`slots[].a11y.required` has no defined meaning yet.** It's a boolean in the schema, but the
-  specification doesn't say what it requires.
 - **The DSDS trait mapping has uncovered cases.** A name used as both a prop and a state (as
   `disabled` is in the example), a boolean prop that also carries `enum`, and a `type` array that
   includes `boolean` each have no single mapping.

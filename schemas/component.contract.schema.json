@@ -187,7 +187,35 @@
       "properties": {
         "name": { "type": "string", "minLength": 1 },
         "description": { "type": "string" },
-        "a11y": { "$ref": "#/$defs/slotAccessibility" }
+        "a11y": { "$ref": "#/$defs/slotAccessibility" },
+        "minChildren": {
+          "description": "The fewest children a usage must supply. 1 makes the slot required. Absent means 0. A publisher checks that minChildren does not exceed maxChildren.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "maxChildren": {
+          "description": "The most children a usage may supply. 1 means only one. Absent means no limit. A run of text counts as one child.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "accepts": {
+          "description": "The contractIds of the only components that may fill this slot. Absent means any component; empty means none. Every entry must be a contractId in the same manifest; a publisher checks this at publish.",
+          "type": "array",
+          "items": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+          "uniqueItems": true
+        },
+        "allowsText": {
+          "description": "Whether text may fill this slot. Absent means true.",
+          "type": "boolean"
+        }
+      },
+      "not": {
+        "description": "A slot with no components and no text could never be filled.",
+        "required": ["accepts", "allowsText"],
+        "properties": {
+          "accepts": { "type": "array", "maxItems": 0 },
+          "allowsText": { "const": false }
+        }
       }
     },
     "slotAccessibility": {
@@ -197,7 +225,10 @@
       "properties": {
         "role": { "type": "string", "minLength": 1 },
         "nameFrom": { "type": "string", "minLength": 1 },
-        "required": { "type": "boolean" }
+        "required": {
+          "description": "Whether the slot's content must give the component an accessible name. Says nothing about whether the slot must be filled; minChildren says that.",
+          "type": "boolean"
+        }
       }
     }
   }

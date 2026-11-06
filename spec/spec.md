@@ -32,7 +32,7 @@ is a separate concern and is listed under Future directions, not specified here.
 
 - The **component contract**: `contractId`, `component`, `description`, typed
   `props` expressed as JSON Schema 2020-12 (each optionally marked
-  `deprecated`), optional `slots` and `states`, optional `exports` saying how
+  `deprecated`), optional `slots` (with rules on what fills them) and `states`, optional `exports` saying how
   code refers to the component, and optional `cemRef` / `shadcnRef` identifiers.
 - The **manifest**: `contractVersion` and the list of component-contract
   artifacts with their paths, content addresses, and origin.
@@ -406,6 +406,36 @@ not changed since its release
   component governs is declared like any other prop, by its full name.
 
 **Derived requirements:** SR-152, SR-153, SR-154
+### SCN-022: Publisher states what may fill a slot
+
+**Given** a `Card` whose `body` must be filled, whose `media` takes at most one
+component and no text, and whose `actions` take at most two primary buttons and
+no text
+**When** the publisher writes those rules on the slot records
+**Then** the contract validates, and a consumer can read each rule without
+consulting any other file
+
+**Acceptance criteria:**
+
+- `"minChildren": 1` means a usage must fill the slot; absent means 0.
+- `"maxChildren": 1` means at most one child; absent means no limit; `0` fails
+  validation. A run of text counts as one child.
+- `"accepts": ["button-primary"]` means no other component may fill the slot;
+  absent means any component; `[]` means no component. Entries match the
+  `contractId` pattern and are unique.
+- `"allowsText": false` means text may not fill the slot; absent means `true`.
+- `"accepts": []` with `"allowsText": false` fails validation.
+- `minChildren: 2` with `maxChildren: 1` is a hard failure at publish naming the
+  slot; the schema alone cannot detect it.
+- An `accepts` entry that is no `contractId` in the manifest is a hard failure at
+  publish naming the slot and the entry.
+- `a11y.required` means the slot's content must give the component an accessible
+  name. It does not mean the slot must be filled.
+- A bare slot name states no rule.
+
+**Derived requirements:** SR-129, SR-155, SR-156, SR-157
+**Covered by:** mapping-pending
+
 ---
 
 ## The fold (normative)
@@ -499,6 +529,9 @@ tagged in the trailing comment.
 - SR-149: If two or more contracts contributing to one manifest carry the same key, then a publisher shall fail the publish naming the key and every contract that carries it, reported together with every other publish-time finding rather than stopping at the first.   # ← SCN-020 (D-83, D-81)
 - SR-150: When a publisher derives `contractId` from an npm package, the publisher shall fold the component's declared name as Appendix A's npm profile defines it, and shall not derive it from any `exports` record.   # ← SCN-020 (D-83)
 - SR-151: A consumer shall keep apart a usage that resolves to a configured design system's module but matches no record (unbound) and a usage that resolves to a module outside every configured design system (outside the system), and shall report the first with the reason it did not bind.   # ← SCN-020 (D-83)
+- SR-155: The schema shall permit on a slot record the optional members `minChildren` (an integer of at least 0), `maxChildren` (an integer of at least 1), `accepts` (unique strings matching the `contractId` pattern), and `allowsText` (a boolean), and shall reject a record whose `accepts` is empty and whose `allowsText` is `false`.   # ← SCN-022 (D-85)
+- SR-156: If a slot's `minChildren` exceeds its `maxChildren`, or a slot's `accepts` names a `contractId` absent from the manifest, then a publisher shall fail the publish naming the slot, reporting it together with every other publish-time finding rather than stopping at the first.   # ← SCN-022 (D-85, D-81)
+- SR-157: A consumer shall read a slot's absent `minChildren` as 0, absent `maxChildren` as no limit, absent `accepts` as any component, absent `allowsText` as `true`, and `a11y.required` as requiring the slot's content to give the component an accessible name.   # ← SCN-022 (D-85)
 
 ### Non-functional requirements
 
@@ -531,6 +564,7 @@ tagged in the trailing comment.
 | SCN-019 | SR-125, SR-144, SR-145 | prop `deprecated` is JSON Schema's own boolean annotation; a trait's deprecated status is derived from it; component deprecation lives in DSDS only (D-82) |
 | SCN-021 | SR-152, SR-153, SR-154 | a schema per version; no extension members; closed is the expected prop set (D-84) |
 | SCN-020 | SR-147, SR-148, SR-149, SR-150, SR-151 | code binding by kind (Appendix B); exact keys; identity from the declared name, never from a binding (Appendix A); unbound kept apart from outside the system (D-83) |
+| SCN-022 | SR-129, SR-155, SR-156, SR-157 | slot rules; one home per fact, so "required" is `minChildren: 1` (D-85) |
 | — | SR-103, SR-104 | schema validatability with stock tooling; key-space closure |
 | — | SR-105, SR-106 | open licensing posture |
 | — | SR-107, SR-108 | composition with prior art |
@@ -622,7 +656,8 @@ is promised.
   a contract with no `props` member is closed (D-71). Closed is the expected
   value and open is a deviation (D-84).
 - **slot** — a named insertion point, as a bare name or a record with `name`,
-  `description`, `a11y` (`role`, `nameFrom`, `required`).
+  `description`, `a11y` (`role`, `nameFrom`, `required`), `minChildren`,
+  `maxChildren`, `accepts`, and `allowsText` (D-85).
 - **state** — a named condition the component can be in, as a non-empty string.
 - **deprecated prop** — still declared and still accepted, but new usages should
   not supply it. Marked with JSON Schema's boolean `deprecated` annotation.
@@ -968,3 +1003,35 @@ records the ruling.
   publisher holding a fact the format lacks cannot carry it in the contract until
   a decision entry adds it. A v0.1 document stays valid against `schemas/v0/`;
   adopting v0.2 changes its `$schema`, and so its content address.
+
+### D-85: slot rules
+
+Proposed on 2026-11-06 by Chris Strahl for the maintainer's ruling. The merge
+records the ruling.
+
+- **D-85: a slot can state how many children it takes and what they may be.**
+  *What:* four optional members on a slot record: `minChildren`, `maxChildren`,
+  `accepts`, and `allowsText` (SR-155). A publisher checks what the schema cannot
+  (SR-156). `a11y.required`, which v0.1 left undefined, is defined as requiring an
+  accessible name (SR-157). *Why:* experience with design system tooling shows
+  the rules authors most want on a slot are that it must be filled, that it takes
+  only one thing, that it takes no bare text, and that it takes only certain
+  components. v0.1 rejected all four, so a contract could name a slot but not
+  govern it. *Prior art:* Nathan Curtis's `@directededges/specs-schema` has
+  `minChildren`, `maxChildren`, and an `anyOf` list with reserved `$text` and
+  `$glyph` markers. Southleft's `ds-contracts-poc` has `required`, `min`, `max`,
+  and `accepts`. The Custom Elements Manifest records only a slot's `name`,
+  `summary`, `description`, and `deprecated`. DSDS has no slot field, and the
+  shadcn registry and DTCG have no equivalent. This entry takes `minChildren` and
+  `maxChildren` from the first and `accepts` from the second. It does not take a
+  separate `required`, because `minChildren: 1` already says it and one fact gets
+  one home (D-82). It does not take `anyOf`, because the name means something
+  else in JSON Schema, or reserved markers, because a list that mixes identifiers
+  and markers cannot say "any component but no text"; `allowsText` can. *Novel:*
+  `allowsText` has no direct precedent and needs a person's decision under CC-5.
+  *Not included:* a preference tier like `ds-contracts-poc`'s `acceptsMode`, since
+  a contract states rules and not picker hints; glyph or image primitives. *Cost:*
+  four optional members and two publish-time checks. `accepts` ties a contract to
+  its manifest's other contracts, so a slot cannot name a component from another
+  design system. Southleft measured its own corpus and found `min` and `max` used
+  on none of 48 slots, so cardinality may see little use from generated contracts.
