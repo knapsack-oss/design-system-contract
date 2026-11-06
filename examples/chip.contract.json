@@ -1,5 +1,5 @@
 {
-  "$schema": "https://knapsack-oss.github.io/design-system-contract/schemas/v0/component.contract.schema.json",
+  "$schema": "https://knapsack-oss.github.io/design-system-contract/schemas/v0.2/component.contract.schema.json",
   "contractId": "chip",
   "component": "Chip",
   "description": "A compact label for a filter, tag, or choice.",
