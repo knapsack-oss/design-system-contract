@@ -349,28 +349,6 @@ undeclared one, and the prop block stays a usable JSON Schema
 - A deprecated value inside an `enum` is not expressible in this version.
 
 **Derived requirements:** SR-125, SR-144, SR-145
-### SCN-021: A consumer picks the schema a document names
-
-**Given** one contract written against the v0.1 schema and one written against
-v0.2, each naming its schema in `$schema`
-**When** a consumer validates both
-**Then** each validates against the schema it names, and a published schema has
-not changed since its release
-
-**Acceptance criteria:**
-
-- Each format version has its own schema `$id`: `schemas/v0/` is v0.1 and
-  `schemas/v0.2/` is v0.2. The bytes at a released `$id` never change.
-- `contractVersion` does not select a schema. It is the version of the design
-  system's published contract set.
-- `$schema` stays optional. A consumer reading a document without it validates
-  against the newest version it holds.
-- `x-acme` at any closed object fails validation. A fact the format covers is
-  written in its member; a fact it does not cover waits for a decision entry.
-- `props` with `patternProperties` fails validation. A DOM attribute a
-  component governs is declared like any other prop, by its full name.
-
-**Derived requirements:** SR-152, SR-153, SR-154
 ### SCN-020: Publisher says how code refers to a component
 
 **Given** a component declared as `IconBadge`, displayed as `Icon Badge`,
@@ -406,6 +384,28 @@ exact key, with no guessing from names:
 **Derived requirements:** SR-147, SR-148, SR-149, SR-150, SR-151
 **Covered by:** mapping-pending
 
+### SCN-021: A consumer picks the schema a document names
+
+**Given** one contract written against the v0.1 schema and one written against
+v0.2, each naming its schema in `$schema`
+**When** a consumer validates both
+**Then** each validates against the schema it names, and a published schema has
+not changed since its release
+
+**Acceptance criteria:**
+
+- Each format version has its own schema `$id`: `schemas/v0/` is v0.1 and
+  `schemas/v0.2/` is v0.2. The bytes at a released `$id` never change.
+- `contractVersion` does not select a schema. It is the version of the design
+  system's published contract set.
+- `$schema` stays optional. A consumer reading a document without it validates
+  against the newest version it holds.
+- `x-acme` at any closed object fails validation. A fact the format covers is
+  written in its member; a fact it does not cover waits for a decision entry.
+- `props` with `patternProperties` fails validation. A DOM attribute a
+  component governs is declared like any other prop, by its full name.
+
+**Derived requirements:** SR-152, SR-153, SR-154
 ---
 
 ## The fold (normative)
@@ -900,35 +900,6 @@ amendments rather than accepting any as an ambiguity. Ruled by Robin on
   contract that uses it; publishers and consumers move to the schema that
   carries it together. A consumer that ignores the marker loses nothing it had
   before.
-### D-84: how the format versions, and what stays closed
-
-Proposed on 2026-11-06 by Chris Strahl for the maintainer's ruling. The merge
-records the ruling.
-
-- **D-84: a schema per format version, no extension members, closed props.**
-  *What, three parts.* **(1) Versioning.** The schemas close every fixed-shape
-  object (SR-104), so any new member makes the previous schema reject documents
-  that use it. Each format version therefore gets its own `$id`, and a released
-  `$id` never changes (SR-152). `schemas/v0/` stays frozen as v0.1; this change
-  and those that follow it publish as `schemas/v0.2/`. A consumer selects by
-  `$schema`. Selecting by `contractVersion` was considered and rejected: that
-  member versions the design system's contract set, not the format. **(2) No
-  extension members.** `x-` members stay invalid (SR-153). Where a publisher's
-  tooling carries a fact the format has a member for, such as a slot, it writes
-  that member. Where the format has none, the gap goes through this change
-  process. **(3) Closed props.** `additionalProperties: true` stays legal but is
-  named as a deviation (SR-154). `patternProperties` is rejected: a rule that
-  opens a prop set by name pattern admits props nobody declared, and a closed
-  set is the point of the format. *Why:* a contract's value is that a reader can
-  trust it as the whole interface. *Prior art:* JSON Schema 2020-12 identifies a
-  schema by `$id`, and defines `patternProperties`. OpenAPI has `x-` extensions
-  and DTCG has `$extensions`; both were considered and not adopted, because an
-  extension point lets each tool grow a private dialect of a format whose job is
-  one reading. *Cost:* a component that spreads DOM attributes must declare each
-  attribute it governs or be published as open, so those contracts are longer. A
-  publisher holding a fact the format lacks cannot carry it in the contract until
-  a decision entry adds it. A v0.1 document stays valid against `schemas/v0/`;
-  adopting v0.2 changes its `$schema`, and so its content address.
 ### D-83 — export records
 
 - **D-83 — a contract can say how code refers to its component.** *What:* an
@@ -967,3 +938,33 @@ records the ruling.
   check. The root is closed (SR-104), so a validator holding the v0.1 schema
   rejects a contract that uses `exports`; publishers and consumers move to the
   schema that carries it together.
+
+### D-84: how the format versions, and what stays closed
+
+Proposed on 2026-11-06 by Chris Strahl for the maintainer's ruling. The merge
+records the ruling.
+
+- **D-84: a schema per format version, no extension members, closed props.**
+  *What, three parts.* **(1) Versioning.** The schemas close every fixed-shape
+  object (SR-104), so any new member makes the previous schema reject documents
+  that use it. Each format version therefore gets its own `$id`, and a released
+  `$id` never changes (SR-152). `schemas/v0/` stays frozen as v0.1; this change
+  and those that follow it publish as `schemas/v0.2/`. A consumer selects by
+  `$schema`. Selecting by `contractVersion` was considered and rejected: that
+  member versions the design system's contract set, not the format. **(2) No
+  extension members.** `x-` members stay invalid (SR-153). Where a publisher's
+  tooling carries a fact the format has a member for, such as a slot, it writes
+  that member. Where the format has none, the gap goes through this change
+  process. **(3) Closed props.** `additionalProperties: true` stays legal but is
+  named as a deviation (SR-154). `patternProperties` is rejected: a rule that
+  opens a prop set by name pattern admits props nobody declared, and a closed
+  set is the point of the format. *Why:* a contract's value is that a reader can
+  trust it as the whole interface. *Prior art:* JSON Schema 2020-12 identifies a
+  schema by `$id`, and defines `patternProperties`. OpenAPI has `x-` extensions
+  and DTCG has `$extensions`; both were considered and not adopted, because an
+  extension point lets each tool grow a private dialect of a format whose job is
+  one reading. *Cost:* a component that spreads DOM attributes must declare each
+  attribute it governs or be published as open, so those contracts are longer. A
+  publisher holding a fact the format lacks cannot carry it in the contract until
+  a decision entry adds it. A v0.1 document stays valid against `schemas/v0/`;
+  adopting v0.2 changes its `$schema`, and so its content address.

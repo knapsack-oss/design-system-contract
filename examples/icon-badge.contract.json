@@ -1,5 +1,5 @@
 {
-  "$schema": "https://knapsack-oss.github.io/design-system-contract/schemas/v0/component.contract.schema.json",
+  "$schema": "https://knapsack-oss.github.io/design-system-contract/schemas/v0.2/component.contract.schema.json",
   "contractId": "iconbadge",
   "component": "Icon Badge",
   "description": "A small status indicator with an icon.",
@@ -12,6 +12,6 @@
     "properties": {
       "tone": { "type": "string", "enum": ["info", "success", "warning"], "default": "info" }
     },
-    "additionalProperties": true
+    "additionalProperties": false
   }
 }
