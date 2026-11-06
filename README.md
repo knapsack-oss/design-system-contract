@@ -130,7 +130,7 @@ npm test
 | [`spec/constitution.md`](spec/constitution.md) | The principles every change to the format must respect |
 | [`schemas/`](schemas) | JSON Schemas for the component contract and the manifest. Where prose and a schema disagree, the schema is correct. |
 | [`examples/`](examples) | A valid contract and manifest |
-| [`test/`](test) | Checks the schemas and examples against the specification |
+| [`test/`](test) | Checks the schemas and examples against the specification. [`test/fixtures/fold.json`](test/fixtures/fold.json) holds `contractId` cases any implementation can run. |
 | [`docs/future-directions.md`](docs/future-directions.md) | What v0.1 deliberately leaves out |
 
 ## Not in v0.1
@@ -149,8 +149,6 @@ changing.
   when `required` names an undeclared prop, a `default` isn't one of its `enum` values, a name folds
   to nothing, or two names fold to the same `contractId`. JSON Schema can't express these, and v0.1
   ships no tool that runs them. A schema validator alone won't catch them.
-- **The `contractId` fold has no executable test.** Its worked examples are in the specification,
-  but nothing in `test/` runs them.
 - **`enum` can be empty.** The schema accepts `"enum": []`, which describes a prop with no allowed
   values.
 - **Prop names are unconstrained.** Any key is accepted under `props.properties`, including `""`.
