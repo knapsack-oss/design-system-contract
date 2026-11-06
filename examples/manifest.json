@@ -1,10 +1,10 @@
 {
-  "$schema": "https://knapsack-oss.github.io/design-system-contract/schemas/v0/manifest.schema.json",
+  "$schema": "https://knapsack-oss.github.io/design-system-contract/schemas/v0.2/manifest.schema.json",
   "contractVersion": "0.1.0",
   "artifacts": [
     {
       "path": "button-primary.contract.json",
-      "address": "sha256:b11ac43d1cf8120534e96ec2d90c24a4c2d9b20364fe01e27632ee7ad63b7dd4",
+      "address": "sha256:be9e9a531041e4b830a099d087aaf3cd6093c99e65b0a4385ca1013933ab0606",
       "origin": "synced"
     }
   ]

@@ -10,14 +10,14 @@ is one file per component, saying which props exist, what type each one is, whic
 and what the defaults are. A manifest lists the component files. Any tool can read the files, and
 any JSON Schema validator can check them.
 
-**Status: v0.1.** Two formats (the component contract and the manifest) and their JSON Schemas.
+**Status: v0.2 (draft).** Two formats (the component contract and the manifest) and their JSON Schemas.
 Licensed [Apache-2.0](LICENSE).
 
 ## A component contract
 
 ```json
 {
-  "$schema": "https://knapsack-oss.github.io/design-system-contract/schemas/v0/component.contract.schema.json",
+  "$schema": "https://knapsack-oss.github.io/design-system-contract/schemas/v0.2/component.contract.schema.json",
   "contractId": "button-primary",
   "component": "Button Primary",
   "description": "The primary call-to-action button.",
@@ -40,8 +40,9 @@ Licensed [Apache-2.0](LICENSE).
 - **`component`** is the design system's own display name, kept exactly as written.
 - **`props`** is itself a JSON Schema, so a tool can check a usage's props against it directly.
   Each prop has a `type` and may have a `default`, a `description`, and an `enum` of allowed values.
-  `additionalProperties` says whether props not listed are allowed. A component with no `props`
-  member takes no props.
+  `additionalProperties` says whether props not listed are allowed. Closed (`false`) is the expected
+  value; open (`true`) is a deviation worth explaining in the contract's `description`. A component
+  with no `props` member takes no props.
 - **Variants are enum props.** There is no separate variants block. A prop named `variant` with an
   `enum` is a variant axis, and so is `size`, `tone`, or anything else with an `enum`.
 - **`slots`** and **`states`** are optional.
@@ -74,12 +75,12 @@ Nothing is silently merged. The rule gives the same answer on every machine, in 
 
 ```json
 {
-  "$schema": "https://knapsack-oss.github.io/design-system-contract/schemas/v0/manifest.schema.json",
+  "$schema": "https://knapsack-oss.github.io/design-system-contract/schemas/v0.2/manifest.schema.json",
   "contractVersion": "0.1.0",
   "artifacts": [
     {
       "path": "button-primary.contract.json",
-      "address": "sha256:b11ac43d1cf8120534e96ec2d90c24a4c2d9b20364fe01e27632ee7ad63b7dd4",
+      "address": "sha256:be9e9a531041e4b830a099d087aaf3cd6093c99e65b0a4385ca1013933ab0606",
       "origin": "synced"
     }
   ]
@@ -133,7 +134,7 @@ npm test
 | [`test/`](test) | Checks the schemas and examples against the specification. [`test/fixtures/fold.json`](test/fixtures/fold.json) holds `contractId` cases any implementation can run. |
 | [`docs/future-directions.md`](docs/future-directions.md) | What v0.1 deliberately leaves out |
 
-## Not in v0.1
+## Not in this version
 
 Design tokens, strictness rules per destination, an agent-facing index, provenance and signing, and
 a checker tool are all out of scope for this version. [Future directions](docs/future-directions.md)
@@ -141,7 +142,7 @@ says what each would add. None of it is a commitment.
 
 ## Known limitations
 
-These are gaps in what v0.1 *does* cover. Each one is a candidate for a patch or minor release, and
+These are gaps in what this version *does* cover. Each one is a candidate for a patch or minor release, and
 each will be settled through the specification's change process rather than by the schema quietly
 changing.
 

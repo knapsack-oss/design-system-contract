@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://knapsack-oss.github.io/design-system-contract/schemas/v0/component.contract.schema.json",
+  "$id": "https://knapsack-oss.github.io/design-system-contract/schemas/v0.2/component.contract.schema.json",
   "title": "Design System Contract: component contract",
   "description": "One JSON document describing the governed interface of exactly one component: identity, display name, typed props, slots, and states. Licensed Apache-2.0.",
   "type": "object",
@@ -50,7 +50,7 @@
   },
   "$defs": {
     "props": {
-      "description": "The component's props, written as a JSON Schema 2020-12 object schema, so a stock validator can check a prop bag against it directly. Optional: a contract that omits props declares an empty, closed prop set. When props is present, additionalProperties is required and states whether undeclared props are allowed. An enum-typed prop is a variant axis; there is no separate variants member.",
+      "description": "The component's props, written as a JSON Schema 2020-12 object schema, so a stock validator can check a prop bag against it directly. Optional: a contract that omits props declares an empty, closed prop set. When props is present, additionalProperties is required and states whether undeclared props are allowed; closed is the expected value, and open is a deviation. An enum-typed prop is a variant axis; there is no separate variants member.",
       "type": "object",
       "required": ["additionalProperties"],
       "additionalProperties": false,
@@ -67,7 +67,7 @@
           "uniqueItems": true
         },
         "additionalProperties": {
-          "description": "false: a prop outside properties is undeclared (closed). true: any prop is permitted (open).",
+          "description": "false: a prop outside properties is undeclared (closed). true: any prop is permitted (open), a deviation a publisher should explain in the contract's description.",
           "type": "boolean"
         }
       }

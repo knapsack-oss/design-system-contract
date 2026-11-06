@@ -1,13 +1,13 @@
 ---
-version: "0.11.0"
+version: "0.12.0"
 status: draft
-last-amended: "2026-09-24"
+last-amended: "2026-11-06"
 amendments-pending: 0
 mapping-pending: true
 effort: contract-spec-wedge
 ---
 
-# Specification — Design System Contract (format, v0.1)
+# Specification — Design System Contract (format, v0.2 draft)
 
 ## Purpose
 
@@ -252,7 +252,7 @@ integrity-checked from the manifest alone
 - This document validates:
   ```json
   {
-    "$schema": "https://knapsack-oss.github.io/design-system-contract/schemas/v0/manifest.schema.json",
+    "$schema": "https://knapsack-oss.github.io/design-system-contract/schemas/v0.2/manifest.schema.json",
     "contractVersion": "3.2.0",
     "artifacts": [
       { "path": "components/button-primary.contract.json",
@@ -322,6 +322,30 @@ following `href` reaches a contract whose `contractId` equals the entry's `id`
 - `label` (string, no enum) → no trait; DSDS traits carry no free-form props.
 
 **Derived requirements:** SR-139, SR-140, SR-141
+**Covered by:** mapping-pending
+
+### SCN-021: A consumer picks the schema a document names
+
+**Given** one contract written against the v0.1 schema and one written against
+v0.2, each naming its schema in `$schema`
+**When** a consumer validates both
+**Then** each validates against the schema it names, and a published schema has
+not changed since its release
+
+**Acceptance criteria:**
+
+- Each format version has its own schema `$id`: `schemas/v0/` is v0.1 and
+  `schemas/v0.2/` is v0.2. The bytes at a released `$id` never change.
+- `contractVersion` does not select a schema. It is the version of the design
+  system's published contract set.
+- `$schema` stays optional. A consumer reading a document without it validates
+  against the newest version it holds.
+- `x-acme` at any closed object fails validation. A fact the format covers is
+  written in its member; a fact it does not cover waits for a decision entry.
+- `props` with `patternProperties` fails validation. A DOM attribute a
+  component governs is declared like any other prop, by its full name.
+
+**Derived requirements:** SR-152, SR-153, SR-154
 **Covered by:** mapping-pending
 
 ---
@@ -408,6 +432,7 @@ tagged in the trailing comment.
 - SR-139: When a consumer projects a prop carrying `enum` onto DSDS traits, the consumer shall emit a trait of that prop's name with `traitType: variant`, `kind: enum`, and `values` ordered default-first then declared order.   # ← SCN-018 (D-80)
 - SR-140: When a consumer projects a prop of `type: boolean` onto DSDS traits, the consumer shall emit a trait of that prop's name with `traitType: variant` and `kind: boolean`.   # ← SCN-018 (D-80)
 - SR-141: When a consumer projects `states` onto DSDS traits, the consumer shall emit for each state a trait of that name with `traitType: state` and `kind: boolean`.   # ← SCN-018 (D-80)
+- SR-154: A publisher should write `props.additionalProperties` as `false`. Where a publisher writes `true`, it should say why in the contract's `description`, and a consumer shall not report an undeclared prop on that contract as a violation.   # ← SCN-021 (D-84)
 
 ### Non-functional requirements
 
@@ -418,6 +443,8 @@ tagged in the trailing comment.
 - SR-107: The system shall reference DSDS, Custom Elements Manifest, shadcn-registry, and DTCG constructs by those specifications' own identifiers rather than redefining them in the contract format.   # ← non-functional, no SCN · retained; amended v0.10.0 (AGENTS.md removed with D-70)
 - SR-108: Where a component contract carries `cemRef` or `shadcnRef`, a publisher shall carry the referenced entry's identifier only and shall not restate the entry's shape in the contract.   # ← non-functional, no SCN · retained; amended v0.10.0
 - SR-142: While its inputs are unchanged, a mechanical check this specification names — schema validation, the fold, collision detection, address recomputation, and the publish-time prop checks — shall produce the identical result on repeated runs.   # ← non-functional, no SCN (INV-1)
+- SR-152: The system shall publish each format version's schemas under a `$id` of their own and shall not change the bytes at a released `$id`.   # ← non-functional, SCN-021 (D-84)
+- SR-153: The schema shall declare no extension member and no extension pattern: a member named `x-` anything, at any object SR-104 closes, fails validation.   # ← non-functional, SCN-021 (D-84)
 - SR-143: The system shall perform every mechanical check this specification names without any model inference call and without any network request.   # ← non-functional, no SCN (INV-1, D-74)
 
 ---
@@ -435,6 +462,7 @@ tagged in the trailing comment.
 | SCN-016 | SR-134, SR-135, SR-006, SR-136, SR-137, SR-133 | slim manifest (D-77); `authored` deferred (D-78); INV-5 in SR form; manifest-level `contractId` uniqueness is SR-133's obligation, not a separate SR (D-81) |
 | SCN-017 | SR-138 | DSDS `specs` pointer (D-76); `contractId` SHOULD equal DSDS `id` is guidance, not an SR |
 | SCN-018 | SR-139, SR-140, SR-141 | DSDS trait mapping (D-80) |
+| SCN-021 | SR-152, SR-153, SR-154 | a schema per version; no extension members; closed is the expected prop set (D-84) |
 | — | SR-103, SR-104 | schema validatability with stock tooling; key-space closure |
 | — | SR-105, SR-106 | open licensing posture |
 | — | SR-107, SR-108 | composition with prior art |
@@ -515,7 +543,8 @@ is promised.
 - **closed / open prop set** — closed: a prop outside `properties` is
   undeclared. Open: any prop is permitted. Stated explicitly by
   `props.additionalProperties`, which is required whenever `props` is present;
-  a contract with no `props` member is closed (D-71).
+  a contract with no `props` member is closed (D-71). Closed is the expected
+  value and open is a deviation (D-84).
 - **slot** — a named insertion point, as a bare name or a record with `name`,
   `description`, `a11y` (`role`, `nameFrom`, `required`).
 - **state** — a named condition the component can be in, as a non-empty string.
@@ -719,3 +748,33 @@ amendments rather than accepting any as an ambiguity. Ruled by Robin on
   become invalid; a consumer wanting collision detection against last month's
   manifest builds it outside this specification. No spelling pinned beyond
   members the schema already names; no invariant changed.
+
+### D-84: how the format versions, and what stays closed
+
+Proposed on 2026-11-06 by Chris Strahl for the maintainer's ruling. The merge
+records the ruling.
+
+- **D-84: a schema per format version, no extension members, closed props.**
+  *What, three parts.* **(1) Versioning.** The schemas close every fixed-shape
+  object (SR-104), so any new member makes the previous schema reject documents
+  that use it. Each format version therefore gets its own `$id`, and a released
+  `$id` never changes (SR-152). `schemas/v0/` stays frozen as v0.1; this change
+  and those that follow it publish as `schemas/v0.2/`. A consumer selects by
+  `$schema`. Selecting by `contractVersion` was considered and rejected: that
+  member versions the design system's contract set, not the format. **(2) No
+  extension members.** `x-` members stay invalid (SR-153). Where a publisher's
+  tooling carries a fact the format has a member for, such as a slot, it writes
+  that member. Where the format has none, the gap goes through this change
+  process. **(3) Closed props.** `additionalProperties: true` stays legal but is
+  named as a deviation (SR-154). `patternProperties` is rejected: a rule that
+  opens a prop set by name pattern admits props nobody declared, and a closed
+  set is the point of the format. *Why:* a contract's value is that a reader can
+  trust it as the whole interface. *Prior art:* JSON Schema 2020-12 identifies a
+  schema by `$id`, and defines `patternProperties`. OpenAPI has `x-` extensions
+  and DTCG has `$extensions`; both were considered and not adopted, because an
+  extension point lets each tool grow a private dialect of a format whose job is
+  one reading. *Cost:* a component that spreads DOM attributes must declare each
+  attribute it governs or be published as open, so those contracts are longer. A
+  publisher holding a fact the format lacks cannot carry it in the contract until
+  a decision entry adds it. A v0.1 document stays valid against `schemas/v0/`;
+  adopting v0.2 changes its `$schema`, and so its content address.
