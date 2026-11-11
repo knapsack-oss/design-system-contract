@@ -16,9 +16,11 @@ what a schema accepts or means (a new member, a renamed one, a changed type or c
 1. **A decision entry** in the "Resolved decisions" section of `spec/spec.md`, saying what changes,
    why, and what it costs. Write it before, or alongside, the schema change.
 2. **A prior-art check.** Before adding a field, look at whether DSDS, the Custom Elements Manifest,
-   the shadcn registry, DTCG, or JSON Schema already names the concept. If one does, use its name.
+   the shadcn registry, DTCG, JSON Schema, or Southleft's `ds-contracts-poc` already names the concept. If one does, use its name.
    Record what you found in the decision entry.
 3. **Updated examples and tests.** `npm test` must pass.
+4. **The next format version.** The schemas are closed, so a change ships under a new schema `$id`
+   (D-84). A version already published never changes.
 
 The principles every change must respect are in `spec/constitution.md`. The main ones: the format
 stays open, every check stays deterministic, and the format composes with neighboring standards

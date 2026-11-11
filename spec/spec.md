@@ -1,13 +1,13 @@
 ---
-version: "0.11.0"
+version: "0.12.0"
 status: draft
-last-amended: "2026-09-24"
+last-amended: "2026-11-06"
 amendments-pending: 0
 mapping-pending: true
 effort: contract-spec-wedge
 ---
 
-# Specification — Design System Contract (format, v0.1)
+# Specification — Design System Contract (format, v0.2 draft)
 
 ## Purpose
 
@@ -31,8 +31,9 @@ is a separate concern and is listed under Future directions, not specified here.
 **In scope**
 
 - The **component contract**: `contractId`, `component`, `description`, typed
-  `props` expressed as JSON Schema 2020-12, optional `slots` and `states`, and
-  optional `cemRef` / `shadcnRef` identifiers.
+  `props` expressed as JSON Schema 2020-12 (each optionally marked
+  `deprecated`), optional `slots` (with rules on what fills them), `states`, and `events`, optional `exports` saying how
+  code refers to the component, and optional `cemRef` / `shadcnRef` identifiers.
 - The **manifest**: `contractVersion` and the list of component-contract
   artifacts with their paths, content addresses, and origin.
 - The published **JSON Schemas** (Draft 2020-12) for both classes, validatable
@@ -252,7 +253,7 @@ integrity-checked from the manifest alone
 - This document validates:
   ```json
   {
-    "$schema": "https://knapsack-oss.github.io/design-system-contract/schemas/v0/manifest.schema.json",
+    "$schema": "https://knapsack-oss.github.io/design-system-contract/schemas/v0.2/manifest.schema.json",
     "contractVersion": "3.2.0",
     "artifacts": [
       { "path": "components/button-primary.contract.json",
@@ -324,6 +325,182 @@ following `href` reaches a contract whose `contractId` equals the entry's `id`
 **Derived requirements:** SR-139, SR-140, SR-141
 **Covered by:** mapping-pending
 
+### SCN-019: Publisher marks a prop as deprecated
+
+**Given** a `Chip` whose `dense` prop still works but has been replaced by
+`size: sm`, and whose `tone` enum prop is being retired in favor of `variant`
+**When** the publisher writes `"deprecated": true` on both props
+**Then** the contract validates, a consumer can tell a deprecated prop from an
+undeclared one, and the prop block stays a usable JSON Schema
+
+**Acceptance criteria:**
+
+- A prop's `deprecated` validates as a boolean; a string fails at that prop's
+  `deprecated`. The prop block still compiles with a stock 2020-12 validator,
+  which reads `deprecated` as its own annotation.
+- A contract with no `deprecated` validates, and means no prop is deprecated.
+- A deprecated prop is still declared: a usage that supplies it is a usage of a
+  declared prop that is deprecated, not of an undeclared one.
+- A consumer projecting onto DSDS gives the `tone` trait (an enum prop) a
+  `deprecated` status. `dense` (a boolean prop) becomes a trait the same way.
+  A deprecated prop of any other type has no trait and stays in the contract.
+- The contract has no component-level deprecation. A deprecated component is
+  recorded on its DSDS component entry's `metadata.status`.
+- A deprecated value inside an `enum` is not expressible in this version.
+
+**Derived requirements:** SR-125, SR-144, SR-145
+### SCN-020: Publisher says how code refers to a component
+
+**Given** a component declared as `IconBadge`, displayed as `Icon Badge`,
+importable from `@acme/ui` and from `@acme/ui/icon-badge` (as its default
+export), and also re-exported from `@acme/ui` as `StatusBadge`
+**When** the publisher writes one `exports` record per way code refers to it
+**Then** the contract validates, its `contractId` is `iconbadge` (the fold of the
+declared name, Appendix A), and a consumer binds each of these usages to it by
+exact key, with no guessing from names:
+`import { IconBadge } from '@acme/ui'`,
+`import { IconBadge as Badge } from '@acme/ui'`,
+`import Badge from '@acme/ui/icon-badge'`, and
+`import { StatusBadge } from '@acme/ui'`
+
+**Acceptance criteria:**
+
+- `exports` is optional; a contract without it validates and cannot be bound
+  to code by this mechanism.
+- Each record carries a `kind`. This version defines three: `js`
+  (`name`, `specifier`), `custom-element` (`tagName`), and `angular-selector`
+  (`selector`). A record of any other kind, or with a member outside its kind's
+  members, fails validation.
+- One contract may carry several records and several kinds: an Angular
+  component carries its `js` import and its `angular-selector`; a custom
+  element carries its `js` module and its `custom-element` tag.
+- A `js` record names one exact module specifier. A component importable from
+  a package root and from a subpath has one record for each. A default export
+  is `name: "default"`; `name: "*"` fails.
+- A local alias in the consuming file does not change the key: the imported
+  export name is matched, not the local name.
+- Two contracts in one manifest carrying the same key fail the publish.
+
+**Derived requirements:** SR-147, SR-148, SR-149, SR-150, SR-151
+**Covered by:** mapping-pending
+
+### SCN-021: A consumer picks the schema a document names
+
+**Given** one contract written against the v0.1 schema and one written against
+v0.2, each naming its schema in `$schema`
+**When** a consumer validates both
+**Then** each validates against the schema it names, and a published schema has
+not changed since its release
+
+**Acceptance criteria:**
+
+- Each format version has its own schema `$id`: `schemas/v0/` is v0.1 and
+  `schemas/v0.2/` is v0.2. The bytes at a released `$id` never change.
+- `contractVersion` does not select a schema. It is the version of the design
+  system's published contract set.
+- `$schema` stays optional. A consumer reading a document without it validates
+  against the newest version it holds.
+- `x-acme` at any closed object fails validation. A fact the format covers is
+  written in its member; a fact it does not cover waits for a decision entry.
+- `props` with `patternProperties` fails validation. A DOM attribute a
+  component governs is declared like any other prop, by its full name.
+
+**Derived requirements:** SR-152, SR-153, SR-154
+### SCN-022: Publisher states what may fill a slot
+
+**Given** a `Card` whose `body` must be filled, whose `media` takes at most one
+component and no text, and whose `actions` take at most two primary buttons and
+no text
+**When** the publisher writes those rules on the slot records
+**Then** the contract validates, and a consumer can read each rule without
+consulting any other file
+
+**Acceptance criteria:**
+
+- `"minChildren": 1` means a usage must fill the slot; absent means 0.
+- `"maxChildren": 1` means at most one child; absent means no limit; `0` fails
+  validation. A run of text counts as one child.
+- `"accepts": ["button-primary"]` means no other component may fill the slot;
+  absent means any component; `[]` means no component. Entries match the
+  `contractId` pattern and are unique.
+- `"allowsText": false` means text may not fill the slot; absent means `true`.
+- `"accepts": []` with `"allowsText": false` fails validation.
+- `minChildren: 2` with `maxChildren: 1` is a hard failure at publish naming the
+  slot; the schema alone cannot detect it.
+- An `accepts` entry that is no `contractId` in the manifest is a hard failure at
+  publish naming the slot and the entry.
+- `a11y.required` means the slot's content must give the component an accessible
+  name. It does not mean the slot must be filled.
+- A bare slot name states no rule.
+
+**Derived requirements:** SR-129, SR-155, SR-156, SR-157
+**Covered by:** mapping-pending
+
+### SCN-023: A manifest cannot point outside its own directory
+
+**Given** a manifest received from a source a consumer does not control
+**When** a record's `path` is `../../etc/passwd`, `/etc/passwd`, or
+`https://example.com/x.json`
+**Then** the manifest fails validation at that `path`, so no consumer following
+the manifest reads outside the manifest's directory or reaches the network
+
+**Acceptance criteria:**
+
+- `components/button.contract.json` and `button.contract.json` pass.
+- A path with a `.` or `..` segment, a leading slash, an empty segment, a trailing
+  slash, a colon, a backslash, or a control character fails.
+- A consumer uses `path` as written. `%2e%2e/a.json` passes validation and names
+  a directory literally called `%2e%2e`.
+
+**Derived requirements:** SR-158, SR-159
+**Covered by:** mapping-pending
+
+### SCN-024: A prop's values must fit its type
+
+**Given** a prop declared `{ "type": "boolean", "default": "yes" }`, or
+`{ "type": "boolean", "enum": ["a"] }`
+**When** a publisher or consumer validates the contract with a stock validator
+**Then** it fails validation at that prop, with no tool beyond the schema
+
+**Acceptance criteria:**
+
+- A `default` and every `enum` value must fit `type`. With an array of types, a
+  value must fit at least one of them.
+- `integer` accepts `2` and `2.0` and rejects `1.5`. `number` accepts all three.
+- `"enum": []` and `"enum": ["a", "a"]` fail validation.
+- A prop named `""` fails validation.
+- Whether `default` is one of the `enum` values stays a publish-time check
+  (SR-127): a stock schema cannot compare one value against another.
+
+**Derived requirements:** SR-160
+**Covered by:** mapping-pending
+
+### SCN-025: Publisher names the events a component emits
+
+**Given** a closed `Dialog` whose usages pass `onOpenChange` and a retired
+`onDismiss` handler
+**When** the publisher lists both in `events`
+**Then** the contract validates, a consumer treats a usage of either as declared,
+and an undeclared handler such as `onClik` is still flagged
+
+**Acceptance criteria:**
+
+- `events` is optional. An entry is a bare non-empty name or a record with `name`
+  required and `description` and `deprecated` optional.
+- A name is written the way usage code writes it: `onClick` in React, `click` for
+  a custom element, `update:modelValue` in Vue, an output's name in Angular.
+- A record with a member outside those three fails validation, including any
+  signature (`type`, `tsType`). The source language's compiler checks signatures.
+- `deprecated` is a boolean with the same meaning as on a prop (SR-144).
+- A name present in both `props.properties` and `events`, or twice in `events` in
+  different forms, is a hard failure at publish naming it.
+- A consumer validating a prop bag against `props` sets declared events aside
+  first; `props` itself holds only JSON values.
+- An event has no DSDS trait.
+
+**Derived requirements:** SR-161, SR-162, SR-163
+**Covered by:** mapping-pending
+
 ---
 
 ## The fold (normative)
@@ -369,7 +546,9 @@ Appendix A.
 | prop with `type: boolean` | `traitType: variant`, `kind: boolean` | |
 | entry in `states` | `traitType: state`, `kind: boolean` | a state is present or absent |
 | prop with any other type | no trait | DSDS traits do not model free-form props; the contract is the record |
+| entry in `events` | no trait | DSDS traits do not model events; the contract is the record (D-88) |
 | cross-prop rules | not in v0.1 | DSDS `combos` is the prior art for v0.2, ahead of cva `compoundVariants` (D-80) |
+| prop with `deprecated: true` | the prop's trait, if it has one, gets status `deprecated`; `description` becomes `deprecationNotice` | a deprecated prop with no trait stays in the contract only. DSDS requires a notice on a deprecated status; a prop with no `description` gives the consumer none to carry, and the consumer records that (D-82) |
 
 The trait's name is the prop or state name, unchanged.
 
@@ -389,7 +568,7 @@ tagged in the trailing comment.
 - SR-122: The schema shall constrain `contractId` to the pattern `^[a-z0-9]+(-[a-z0-9]+)*$`.   # ← SCN-010, SCN-014 (D-75, D-79)
 - SR-123: A publisher shall carry `component` as the design system's own display name, verbatim, and shall not fold it, derive it from `contractId`, or require it to equal `contractId`.   # ← SCN-010 (D-75)
 - SR-124: The schema shall express `props` as a JSON Schema 2020-12 object schema whose permitted members are exactly `properties`, `required`, and `additionalProperties`, with `additionalProperties` a required boolean whenever `props` is present.   # ← SCN-011, SCN-012 (D-71)
-- SR-125: The schema shall require `type` in each `props.properties` entry and shall permit exactly the members `type`, `default`, `description`, and `enum`, with `type` restricted to the 2020-12 type names or an array of them.   # ← SCN-011 (D-71) · amended v0.11.0 (D-81)
+- SR-125: The schema shall require `type` in each `props.properties` entry and shall permit exactly the members `type`, `default`, `description`, `enum`, and `deprecated`, with `type` restricted to the 2020-12 type names or an array of them and `deprecated` a boolean.   # ← SCN-011, SCN-019 (D-71) · amended v0.11.0 (D-81) · amended (D-82)
 - SR-126: If `props.required` names a prop that is not a key of `props.properties`, then a publisher shall fail the publish naming that prop, reporting it together with every other publish-time finding rather than stopping at the first.   # ← SCN-011 · amended v0.11.0 (D-81)
 - SR-127: If a prop carries both `enum` and `default` and the default is not one of the enum values, then a publisher shall fail the publish naming that prop, reporting it together with every other publish-time finding rather than stopping at the first.   # ← SCN-011 · amended v0.11.0 (D-81)
 - SR-128: The schema shall declare no `variants` member; a prop of any name, including `variant`, whose schema carries `enum` is a variant axis.   # ← SCN-011 (D-73)
@@ -408,6 +587,23 @@ tagged in the trailing comment.
 - SR-139: When a consumer projects a prop carrying `enum` onto DSDS traits, the consumer shall emit a trait of that prop's name with `traitType: variant`, `kind: enum`, and `values` ordered default-first then declared order.   # ← SCN-018 (D-80)
 - SR-140: When a consumer projects a prop of `type: boolean` onto DSDS traits, the consumer shall emit a trait of that prop's name with `traitType: variant` and `kind: boolean`.   # ← SCN-018 (D-80)
 - SR-141: When a consumer projects `states` onto DSDS traits, the consumer shall emit for each state a trait of that name with `traitType: state` and `kind: boolean`.   # ← SCN-018 (D-80)
+- SR-144: Where a prop's `deprecated` is `true`, a consumer shall treat that prop as declared and deprecated; where `deprecated` is absent or `false`, the consumer shall treat it as not deprecated.   # ← SCN-019 (D-82)
+- SR-145: When a consumer projects a deprecated prop onto a DSDS trait under SR-139 or SR-140, the consumer shall give that trait the status `deprecated`, carrying the prop's `description`, if any, as the trait's `deprecationNotice`.   # ← SCN-019 (D-82)
+- SR-154: A publisher should write `props.additionalProperties` as `false`. Where a publisher writes `true`, it should say why in the contract's `description`, and a consumer shall not report an undeclared prop on that contract as a violation.   # ← SCN-021 (D-84)
+- SR-147: The schema shall permit an optional root `exports` array of at least one unique record, each record a `js`, `custom-element`, or `angular-selector` record with exactly the members Appendix B gives that kind, and shall reject a record of any other kind.   # ← SCN-020 (D-83)
+- SR-148: Where a component contract carries `exports`, a consumer shall bind a usage to that contract only when the usage's key equals a record's key under the matching rule Appendix B gives that record's kind, and shall not bind by `component` or `contractId` alone.   # ← SCN-020 (D-83)
+- SR-149: If two or more contracts contributing to one manifest carry the same key, then a publisher shall fail the publish naming the key and every contract that carries it, reported together with every other publish-time finding rather than stopping at the first.   # ← SCN-020 (D-83, D-81)
+- SR-150: When a publisher derives `contractId` from an npm package, the publisher shall fold the component's declared name as Appendix A's npm profile defines it, and shall not derive it from any `exports` record.   # ← SCN-020 (D-83)
+- SR-151: A consumer shall keep apart a usage that resolves to a configured design system's module but matches no record (unbound) and a usage that resolves to a module outside every configured design system (outside the system), and shall report the first with the reason it did not bind.   # ← SCN-020 (D-83)
+- SR-155: The schema shall permit on a slot record the optional members `minChildren` (an integer of at least 0), `maxChildren` (an integer of at least 1), `accepts` (unique strings matching the `contractId` pattern), and `allowsText` (a boolean), and shall reject a record whose `accepts` is empty and whose `allowsText` is `false`.   # ← SCN-022 (D-85)
+- SR-156: If a slot's `minChildren` exceeds its `maxChildren`, or a slot's `accepts` names a `contractId` absent from the manifest, then a publisher shall fail the publish naming the slot, reporting it together with every other publish-time finding rather than stopping at the first.   # ← SCN-022 (D-85, D-81)
+- SR-157: A consumer shall read a slot's absent `minChildren` as 0, absent `maxChildren` as no limit, absent `accepts` as any component, absent `allowsText` as `true`, and `a11y.required` as requiring the slot's content to give the component an accessible name.   # ← SCN-022 (D-85)
+- SR-158: The schema shall constrain each artifact record's `path` to one or more forward-slash-separated segments, none of them `.` or `..`, and none containing a backslash, a colon, or a control character.   # ← SCN-023 (D-86)
+- SR-159: A consumer shall resolve `path` against the manifest's own directory as written, shall not percent-decode it, and shall not follow a symbolic link out of that directory.   # ← SCN-023 (D-86)
+- SR-160: The schema shall reject a prop whose `default` or any `enum` value does not fit its `type`, a prop whose `enum` is empty or holds duplicates, and an empty prop name.   # ← SCN-024 (D-87)
+- SR-161: The schema shall define `events` as an optional array of unique items, each a non-empty string or a record with required `name` and optional `description` and boolean `deprecated`, and shall declare no member for a signature.   # ← SCN-025 (D-88)
+- SR-162: If a name appears in both `props.properties` and `events`, or more than once in `events`, then a publisher shall fail the publish naming it, reporting it together with every other publish-time finding rather than stopping at the first.   # ← SCN-025 (D-88, D-81)
+- SR-163: A consumer shall treat a usage of a name in `events` as declared whether `props` is closed or open, shall set those names aside before validating a prop bag against `props`, and shall not report a signature finding from a contract.   # ← SCN-025 (D-88)
 
 ### Non-functional requirements
 
@@ -418,6 +614,8 @@ tagged in the trailing comment.
 - SR-107: The system shall reference DSDS, Custom Elements Manifest, shadcn-registry, and DTCG constructs by those specifications' own identifiers rather than redefining them in the contract format.   # ← non-functional, no SCN · retained; amended v0.10.0 (AGENTS.md removed with D-70)
 - SR-108: Where a component contract carries `cemRef` or `shadcnRef`, a publisher shall carry the referenced entry's identifier only and shall not restate the entry's shape in the contract.   # ← non-functional, no SCN · retained; amended v0.10.0
 - SR-142: While its inputs are unchanged, a mechanical check this specification names — schema validation, the fold, collision detection, address recomputation, and the publish-time prop checks — shall produce the identical result on repeated runs.   # ← non-functional, no SCN (INV-1)
+- SR-152: The system shall publish each format version's schemas under a `$id` of their own and shall not change the bytes at a released `$id`.   # ← non-functional, SCN-021 (D-84)
+- SR-153: The schema shall declare no extension member and no extension pattern: a member named `x-` anything, at any object SR-104 closes, fails validation.   # ← non-functional, SCN-021 (D-84)
 - SR-143: The system shall perform every mechanical check this specification names without any model inference call and without any network request.   # ← non-functional, no SCN (INV-1, D-74)
 
 ---
@@ -435,6 +633,13 @@ tagged in the trailing comment.
 | SCN-016 | SR-134, SR-135, SR-006, SR-136, SR-137, SR-133 | slim manifest (D-77); `authored` deferred (D-78); INV-5 in SR form; manifest-level `contractId` uniqueness is SR-133's obligation, not a separate SR (D-81) |
 | SCN-017 | SR-138 | DSDS `specs` pointer (D-76); `contractId` SHOULD equal DSDS `id` is guidance, not an SR |
 | SCN-018 | SR-139, SR-140, SR-141 | DSDS trait mapping (D-80) |
+| SCN-019 | SR-125, SR-144, SR-145 | prop `deprecated` is JSON Schema's own boolean annotation; a trait's deprecated status is derived from it; component deprecation lives in DSDS only (D-82) |
+| SCN-021 | SR-152, SR-153, SR-154 | a schema per version; no extension members; closed is the expected prop set (D-84) |
+| SCN-020 | SR-147, SR-148, SR-149, SR-150, SR-151 | code binding by kind (Appendix B); exact keys; identity from the declared name, never from a binding (Appendix A); unbound kept apart from outside the system (D-83) |
+| SCN-022 | SR-129, SR-155, SR-156, SR-157 | slot rules; one home per fact, so "required" is `minChildren: 1` (D-85) |
+| SCN-023 | SR-158, SR-159 | `path` stays inside the manifest's directory; supports SR-143's no-network rule (D-86) |
+| SCN-024 | SR-160 | value checks a stock validator can run; default-in-enum stays with SR-127 (D-87) |
+| SCN-025 | SR-161, SR-162, SR-163 | events by name; signatures stay with the compiler; closed prop sets stop flagging handlers (D-88) |
 | — | SR-103, SR-104 | schema validatability with stock tooling; key-space closure |
 | — | SR-105, SR-106 | open licensing posture |
 | — | SR-107, SR-108 | composition with prior art |
@@ -477,7 +682,7 @@ destination); a thin agent index (`AGENTS.md`); an append-only provenance log;
 signing and attestation, including manifest-level and per-artifact `signer` /
 `signature` slots, a per-artifact `ratified` state, and a `canonicalForm`
 cache (D-77); the origin value `authored` (D-78); richer per-prop JSON Schema
-keywords; cross-prop rules composing with DSDS `combos`; collision detection
+keywords; deprecation of a single enum value (D-82); cross-prop rules composing with DSDS `combos`; collision detection
 against previously published manifests (D-81); a deterministic checker that
 never calls a model; and a CI action. None of these is specified here and none
 is promised.
@@ -498,6 +703,14 @@ is promised.
   D-81).
 - **declared name** — the name a publisher's source gives a component; the input
   to the fold. What counts as the declared name per source kind is Appendix A.
+- **export record** — one entry in `exports`: one way code refers to the
+  component, as a `kind` plus that kind's key. A contract may carry several
+  (D-83).
+- **binding** — the link a consumer makes from a usage in code to the contract
+  that governs it, by matching the usage's key against export records.
+- **unbound** — a usage that resolves to a configured design system's module
+  but matches no export record. Not the same as a usage from outside every
+  configured design system (D-83).
 - **fold** — the five-step derivation from declared name to `contractId`, with
   two rejection classes and collision as hard failure.
 - **residual character** — a character remaining after the fold that is outside
@@ -515,14 +728,23 @@ is promised.
 - **closed / open prop set** — closed: a prop outside `properties` is
   undeclared. Open: any prop is permitted. Stated explicitly by
   `props.additionalProperties`, which is required whenever `props` is present;
-  a contract with no `props` member is closed (D-71).
+  a contract with no `props` member is closed (D-71). Closed is the expected
+  value and open is a deviation (D-84).
 - **slot** — a named insertion point, as a bare name or a record with `name`,
-  `description`, `a11y` (`role`, `nameFrom`, `required`).
+  `description`, `a11y` (`role`, `nameFrom`, `required`), `minChildren`,
+  `maxChildren`, `accepts`, and `allowsText` (D-85).
 - **state** — a named condition the component can be in, as a non-empty string.
+- **event** — something a component emits, named the way usage code writes it, as
+  a bare name or a record with `name`, `description`, `deprecated`. Carries no
+  signature (D-88).
+- **deprecated prop** — still declared and still accepted, but new usages should
+  not supply it. Marked with JSON Schema's boolean `deprecated` annotation.
+  Removal is a separate event: a removed prop is undeclared. Component
+  deprecation is not a contract concept; it is a DSDS entry status (D-82).
 - **manifest** — `manifest.json`: `contractVersion` plus one artifact record per
   component contract.
 - **artifact record** — `{ path, address, origin }`; `path` relative to the
-  manifest's directory; `origin` is `inferred` (derived without owner
+  manifest's directory and never leaving it (D-86); `origin` is `inferred` (derived without owner
   confirmation) or `synced` (retrieved from the design system's source of truth).
 - **content address** — `sha256:<hex>` of an artifact's canonical form.
 - **canonical form** — the serialization of a JSON artifact over which its
@@ -559,8 +781,43 @@ which source identifier it folds (for example a React export name, a Custom
 Elements Manifest `tagName`, or a design-tool component name) in its own
 documentation. A publisher SHOULD fold the same source identifier for a
 component on every publish, so that a component's `contractId` is stable across
-publishes (D-81). Profiles are a v0.2 candidate; the fold itself does not change
-with the profile.
+publishes (D-81). The fold itself does not change with the profile.
+
+### Profile: npm package, component unit (D-83)
+
+- **Unit:** one component declaration in the package's published type
+  declarations, however many ways it is exported.
+- **Declared name:** the declaration's own written name: its class or function
+  name, exactly as written in the declaration file. Where a Custom Elements
+  Manifest describes it, the manifest declaration's `name` (the class name).
+- **Not read:** export names, including `default` and renamed exports; a
+  custom element's `tagName`. These are export records (Appendix B), not
+  identity.
+- **Merging:** two exports of one declaration are one unit with two export
+  records, never two contracts.
+- **Rejection:** a declaration with no written name, such as an anonymous
+  default export, is rejected as unnormalizable; the publisher names it.
+
+---
+
+## Appendix B — Export record kinds (D-83)
+
+Each kind answers six questions, so two tools reading the same contract bind
+the same usages. A new kind is added by answering the same six.
+
+| Question | `js` | `custom-element` | `angular-selector` |
+|---|---|---|---|
+| Reference form: how usage code names the component | an import of a named or default export | a tag in HTML, JSX, or a template | an element or attribute in an Angular template |
+| Key members | `name`, `specifier` | `tagName` | `selector` |
+| Normalization | none; both compared exactly. A local alias is resolved to the imported name first | a usage's tag name is ASCII-lowercased, as HTML parsing does | none; the selector is used as written |
+| Matching rule | the import's specifier equals `specifier` and its imported export name equals `name`; a namespace import's member access counts as importing that member | the lowercased tag equals `tagName` | Angular's own selector matching against the element |
+| Scope | modules the consuming project depends on | the page's custom element registry; a tag names one element per page | components the template's module or standalone `imports` bring in |
+| Prior-art name | the ECMAScript module specifier; the Custom Elements Manifest's export `name` | the Custom Elements Manifest's `tagName` | Angular's `selector` |
+
+Considered for later kinds, not defined here: Swift (`name` plus `module`),
+Svelte and Vue single-file components (covered by `js` when imported; Vue
+global registration is name-based), and scoped custom element registries,
+whose local tags a scanner resolves back to the `js` record.
 
 ---
 
@@ -719,3 +976,205 @@ amendments rather than accepting any as an ambiguity. Ruled by Robin on
   become invalid; a consumer wanting collision detection against last month's
   manifest builds it outside this specification. No spelling pinned beyond
   members the schema already names; no invariant changed.
+
+
+### D-82 — prop deprecation
+
+- **D-82 — a prop can be marked deprecated; a component cannot.** *What:* an
+  optional boolean `deprecated` on each prop (SR-125), meaning "declared, still
+  accepted, stop using it" (SR-144). A deprecated enum or boolean prop's DSDS
+  trait takes the status `deprecated`, derived from the contract (SR-145). The
+  contract gains no component-level marker. *Prior art:* JSON Schema 2020-12
+  defines `deprecated` as a boolean annotation in its meta-data vocabulary;
+  because `props` is a JSON Schema, the marker is that keyword, unchanged, and a
+  prop block stays compilable by any stock validator. The Custom Elements
+  Manifest marks attributes and properties with `deprecated: boolean | string`
+  and DTCG marks tokens with `$deprecated: boolean | string`; both confirm the
+  name. DSDS models lifecycle as a `status` on entries, traits, and trait
+  values, with a required `deprecationNotice` and an optional `replacedBy`.
+  Southleft's `ds-contracts-poc`
+  carries `status: draft | stable | deprecated` on a component; the same need is
+  met here by DSDS, which already holds component lifecycle. The shadcn registry has no equivalent. *Why:* without it, a
+  contract can say a prop is declared or not, but not "declared, being phased
+  out". A tool reading the contract either keeps recommending the old prop or,
+  if the prop is dropped, reports every working usage as invalid. *Why one
+  home per fact:* a design system author who can mark the same thing deprecated
+  in two files will, sooner or later, mark it in one and not the other, and
+  every reader then has to decide which file wins. A component's lifecycle is
+  already a DSDS entry status, so the contract does not restate it (INV-4). A
+  prop's deprecation has no DSDS home unless the prop becomes a trait, and
+  traits are already projected from the contract (D-80), so the contract is
+  where it is written and the trait status follows from it. *Not included:* a
+  reason string on a prop (JSON Schema's keyword is boolean, and a string would
+  make the prop block an invalid JSON Schema; the reason goes in
+  `description`); deprecating one value of an `enum`; a successor pointer, which
+  DSDS offers as `replacedBy`. *Cost:* one optional prop member. The prop
+  object is closed (SR-104), so a validator holding the v0.1 schema rejects a
+  contract that uses it; publishers and consumers move to the schema that
+  carries it together. A consumer that ignores the marker loses nothing it had
+  before.
+### D-83 — export records
+
+- **D-83 — a contract can say how code refers to its component.** *What:* an
+  optional root `exports` of typed records (SR-147), three kinds in this
+  version (Appendix B). A consumer binds a usage only by exact key (SR-148); a
+  publisher fails a publish where two contracts claim one key (SR-149). For an
+  npm source, `contractId` comes from the declared name, never from an export
+  record (SR-150, Appendix A). Unbound usages are kept apart from usages
+  outside the system (SR-151). *Why:* D-75 separated identity from display
+  name and deferred how a checker binds a usage to a contract. Without a
+  binding, a tool that reads `<Button variant="hero">` cannot know which
+  contract governs `Button`: the display name may differ, the fold loses case,
+  two packages can each export a `Button`, templates name components by tag or
+  selector, and one component is often exported under several names. Tools
+  then match by name and are quietly wrong, or skip component checks.
+  *Why keys, not names:* each record is the exact thing a usage carries, so
+  matching is equality, and both precision and recall are measurable against
+  labeled usages. *Why identity stays separate:* `contractId` must stay a
+  lowercase DSDS-compatible id (D-75, D-79), and export names vary and can be
+  reordered; deriving identity from the declaration gives one source however a
+  component is exported. *Prior art:* the Custom Elements Manifest records
+  exports by `name` and custom elements by `tagName`; ECMAScript calls the
+  import string a module specifier; Angular calls its template key a
+  `selector`. DSDS 0.23 puts `imports[{ platform, code, package }]` on a
+  component entry; `code` is an import statement written for people, and
+  there is no structured export name. Southleft's `ds-contracts-poc`
+  pairs the same two facts in `bindings.code.anchors { importPath, export }`,
+  one per contract, pointing at the component's source in the design system's
+  repository; that links a contract to its own source. This proposal serves
+  the other direction, tools reading product code, so it records the
+  published specifiers that code imports and allows several records per
+  contract. The two compose. *Not included:* Swift, Vue global
+  names, and other kinds (Appendix B lists candidates); an extension point for
+  unknown kinds (each new kind is a schema change until the format reaches
+  1.0); a platform field (D-75). *Cost:* one optional member and a publish-time
+  check. The root is closed (SR-104), so a validator holding the v0.1 schema
+  rejects a contract that uses `exports`; publishers and consumers move to the
+  schema that carries it together.
+
+### D-84: how the format versions, and what stays closed
+
+Proposed on 2026-11-06 by Chris Strahl for the maintainer's ruling. The merge
+records the ruling.
+
+- **D-84: a schema per format version, no extension members, closed props.**
+  *What, three parts.* **(1) Versioning.** The schemas close every fixed-shape
+  object (SR-104), so any new member makes the previous schema reject documents
+  that use it. Each format version therefore gets its own `$id`, and a released
+  `$id` never changes (SR-152). `schemas/v0/` stays frozen as v0.1; this change
+  and those that follow it publish as `schemas/v0.2/`. A consumer selects by
+  `$schema`. Selecting by `contractVersion` was considered and rejected: that
+  member versions the design system's contract set, not the format. **(2) No
+  extension members.** `x-` members stay invalid (SR-153). Where a publisher's
+  tooling carries a fact the format has a member for, such as a slot, it writes
+  that member. Where the format has none, the gap goes through this change
+  process. **(3) Closed props.** `additionalProperties: true` stays legal but is
+  named as a deviation (SR-154). `patternProperties` is rejected: a rule that
+  opens a prop set by name pattern admits props nobody declared, and a closed
+  set is the point of the format. *Why:* a contract's value is that a reader can
+  trust it as the whole interface. *Prior art:* JSON Schema 2020-12 identifies a
+  schema by `$id`, and defines `patternProperties`. OpenAPI has `x-` extensions
+  and DTCG has `$extensions`; both were considered and not adopted, because an
+  extension point lets each tool grow a private dialect of a format whose job is
+  one reading. *Cost:* a component that spreads DOM attributes must declare each
+  attribute it governs or be published as open, so those contracts are longer. A
+  publisher holding a fact the format lacks cannot carry it in the contract until
+  a decision entry adds it. A v0.1 document stays valid against `schemas/v0/`;
+  adopting v0.2 changes its `$schema`, and so its content address.
+
+### D-85: slot rules
+
+Proposed on 2026-11-06 by Chris Strahl for the maintainer's ruling. The merge
+records the ruling.
+
+- **D-85: a slot can state how many children it takes and what they may be.**
+  *What:* four optional members on a slot record: `minChildren`, `maxChildren`,
+  `accepts`, and `allowsText` (SR-155). A publisher checks what the schema cannot
+  (SR-156). `a11y.required`, which v0.1 left undefined, is defined as requiring an
+  accessible name (SR-157). *Why:* experience with design system tooling shows
+  the rules authors most want on a slot are that it must be filled, that it takes
+  only one thing, that it takes no bare text, and that it takes only certain
+  components. v0.1 rejected all four, so a contract could name a slot but not
+  govern it. *Prior art:* Nathan Curtis's `@directededges/specs-schema` has
+  `minChildren`, `maxChildren`, and an `anyOf` list with reserved `$text` and
+  `$glyph` markers. Southleft's `ds-contracts-poc` has `required`, `min`, `max`,
+  and `accepts`. The Custom Elements Manifest records only a slot's `name`,
+  `summary`, `description`, and `deprecated`. DSDS has no slot field, and the
+  shadcn registry and DTCG have no equivalent. This entry takes `minChildren` and
+  `maxChildren` from the first and `accepts` from the second. It does not take a
+  separate `required`, because `minChildren: 1` already says it and one fact gets
+  one home (D-82). It does not take `anyOf`, because the name means something
+  else in JSON Schema, or reserved markers, because a list that mixes identifiers
+  and markers cannot say "any component but no text"; `allowsText` can. *Novel:*
+  `allowsText` has no direct precedent and needs a person's decision under CC-5.
+  *Not included:* a preference tier like `ds-contracts-poc`'s `acceptsMode`, since
+  a contract states rules and not picker hints; glyph or image primitives. *Cost:*
+  four optional members and two publish-time checks. `accepts` ties a contract to
+  its manifest's other contracts, so a slot cannot name a component from another
+  design system. Southleft measured its own corpus and found `min` and `max` used
+  on none of 48 slots, so cardinality may see little use from generated contracts.
+
+### D-86: manifest paths stay inside the manifest's directory
+
+Proposed on 2026-11-06 by Chris Strahl for the maintainer's ruling. The merge
+records the ruling.
+
+- **D-86: `path` cannot leave the manifest's directory.** *What:* a schema pattern
+  on `path` (SR-158) and a consumer rule for reading it (SR-159). *Why:* SR-136
+  said `path` is relative, but the schema accepted `../../etc/passwd`, an absolute
+  path, and a URL, and under D-74 the schema wins. A consumer following such a
+  manifest could read outside the design system's files, or make the network
+  request SR-143 forbids. A content address does not help, since the same manifest
+  supplies it. *Prior art:* this adds no member, so PROH-4's check does not apply; RFC 3986
+  names the dot segments. *Cost:* a publisher cannot list contracts stored above
+  the manifest, and must move the manifest up instead. The pattern rejects a colon
+  anywhere in a path, so a file name with a colon must be renamed. Symbolic links
+  are invisible to a schema, so SR-159 leaves them to the consumer.
+
+### D-87: prop values fit their type
+
+Proposed on 2026-11-06 by Chris Strahl for the maintainer's ruling. The merge
+records the ruling.
+
+- **D-87: the schema checks `default` and `enum` against `type`.** *What:* seven
+  conditional branches on the prop schema, plus `minItems` and `uniqueItems` on
+  `enum` and a non-empty prop name (SR-160). *Why:* `{ "type": "boolean", "default":
+  "yes" }` validated, so a consumer told by a contract to fill in that default
+  would write a value of the wrong type. These checks fit in JSON Schema, so every
+  stock validator runs them and no tool is needed. *Prior art:* this adds no member.
+  JSON Schema 2020-12 recommends that a `default` be valid against its schema and
+  that `enum` have at least one element and no duplicates; this entry makes those
+  hard rules. *Cost:* existing contracts that break these rules become invalid under
+  v0.2. A validator's error points into the `allOf` branch, not at a plain message
+  about the prop. Default-in-enum stays a publish-time check.
+
+### D-88: events by name
+
+Proposed on 2026-11-06 by Chris Strahl for the maintainer's ruling. The merge
+records the ruling.
+
+- **D-88: a contract names the events a component emits and leaves signatures to
+  the compiler.** *What:* an optional root `events` of bare names or records
+  (SR-161). A publisher fails a name used as both a prop and an event (SR-162). A
+  consumer treats a listed event as declared and sets it aside before validating
+  a prop bag (SR-163). *Why:* a callback is not a JSON value, so `props` cannot
+  type it honestly. v0.1 left two bad choices: declare `onClick` with a false
+  `type`, or omit it and have a closed contract flag every working handler. Typing
+  each signature was considered and rejected. A single design system has dozens of
+  distinct signatures, many over its own domain types, so a contract would have to
+  restate a type system the source language's compiler already enforces, and could
+  disagree with it. A contract needs the name; the compiler has the signature.
+  *Prior art:* the Custom Elements Manifest has `events` with `name`, `summary`,
+  `description`, a required `type`, and `deprecated`. Southleft's `ds-contracts-poc`
+  has `events` with `name`, `description`, and framework `bindings`. This entry
+  takes the member name and those shared fields. It drops `type` for the reason
+  above and keeps `deprecated` boolean to match D-82. It does not take the
+  `bindings` map: one name per usage form is written directly, as `exports`
+  records several. DSDS documents events as prose in a `definitions` section and
+  has no event data; the shadcn registry and DTCG have no equivalent, and neither
+  does `@directededges/specs-schema`. *Not included:* payload shapes, bubbling or
+  cancelation, and any way to say an event is required. *Cost:* one optional member
+  and a publish-time check. A consumer cannot catch a handler with the wrong
+  signature from the contract alone. A component written for several frameworks
+  lists each framework's spelling or has a contract per framework, because a name
+  is matched as usage code writes it.
