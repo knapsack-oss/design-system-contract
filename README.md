@@ -39,7 +39,7 @@ Licensed [Apache-2.0](LICENSE).
   the component, by a fixed rule (below).
 - **`component`** is the design system's own display name, kept exactly as written.
 - **`props`** is itself a JSON Schema, so a tool can check a usage's props against it directly.
-  Each prop has a `type` and may have a `default`, a `description`, and an `enum` of allowed values.
+  Each prop has a `type` that its other values must fit, and may have a `default`, a `description`, and an `enum` of allowed values.
   `additionalProperties` says whether props not listed are allowed. Closed (`false`) is the expected
   value; open (`true`) is a deviation worth explaining in the contract's `description`. A component
   with no `props` member takes no props.
@@ -55,6 +55,9 @@ Licensed [Apache-2.0](LICENSE).
   `{ "kind": "js", "name": "Button", "specifier": "@acme/ui" }`, a custom element
   `tagName`, or an Angular `selector`. A tool matches a usage in product code against these
   exactly, so it finds the right contract whatever the display name is.
+- **`events`** (optional) names what the component emits, the way usage code writes it: `onClick`,
+  `click`, `update:modelValue`. A declared event isn't an undeclared prop. Signatures stay with your
+  compiler, so the contract never restates them.
 - **`cemRef`** and **`shadcnRef`** (optional) point at the same component's entry in a
   [Custom Elements Manifest](https://github.com/webcomponents/custom-elements-manifest) or a
   [shadcn registry](https://ui.shadcn.com). They are identifiers only; the contract doesn't copy
@@ -158,11 +161,9 @@ changing.
 - **Some publish-time checks live only in the specification.** The spec says a publisher must fail
   when `required` names an undeclared prop, a `default` isn't one of its `enum` values, a name folds
   to nothing, two names fold to the same `contractId`, a slot's `minChildren` exceeds its
-  `maxChildren`, or `accepts` names a `contractId` the manifest doesn't have. JSON Schema can't express these, and v0.1
+  `maxChildren`, `accepts` names a `contractId` the manifest doesn't have, or a name is both a prop
+  and an event. JSON Schema can't express these, and v0.1
   ships no tool that runs them. A schema validator alone won't catch them.
-- **`enum` can be empty.** The schema accepts `"enum": []`, which describes a prop with no allowed
-  values.
-- **Prop names are unconstrained.** Any key is accepted under `props.properties`, including `""`.
 - **`contractVersion` is free text.** It must be non-empty but doesn't have to be a semantic version.
 - **The DSDS trait mapping has uncovered cases.** A name used as both a prop and a state (as
   `disabled` is in the example), a boolean prop that also carries `enum`, and a `type` array that
