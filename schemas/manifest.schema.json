@@ -30,9 +30,9 @@
       "additionalProperties": false,
       "properties": {
         "path": {
-          "description": "Location of the contract file, relative to the manifest's own directory.",
+          "description": "Location of the contract file, relative to the manifest's own directory and always inside it: forward-slash segments, with no . or .. segment, no leading slash, no colon, no backslash, and no control character. Not a URL, and never percent-decoded.",
           "type": "string",
-          "minLength": 1
+          "pattern": "^(?!\\.{1,2}(/|$))(?!.*/\\.{1,2}(/|$))[^/\\\\:\\u0000-\\u001f]+(/[^/\\\\:\\u0000-\\u001f]+)*$"
         },
         "address": {
           "description": "sha256: plus the lowercase hex SHA-256 digest of the contract's canonical form (RFC 8785, JSON Canonicalization Scheme, as UTF-8). A mismatch makes the artifact invalid.",

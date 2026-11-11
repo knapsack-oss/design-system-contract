@@ -6,6 +6,26 @@
       "path": "button-primary.contract.json",
       "address": "sha256:be9e9a531041e4b830a099d087aaf3cd6093c99e65b0a4385ca1013933ab0606",
       "origin": "synced"
+    },
+    {
+      "path": "chip.contract.json",
+      "address": "sha256:4a946d52be91aeacf80e9926eed0dc59a871e10d6212a5e1eccaeb90052e4e94",
+      "origin": "synced"
+    },
+    {
+      "path": "icon-badge.contract.json",
+      "address": "sha256:93f5566ef78a6915528e750311ce428cacd1206684f732abfab9474e1939430b",
+      "origin": "inferred"
+    },
+    {
+      "path": "card.contract.json",
+      "address": "sha256:77d695b9098bf57a3f36a44a3474dd6aaf4db2a360beff3123ce943b30c7ed48",
+      "origin": "synced"
+    },
+    {
+      "path": "dialog.contract.json",
+      "address": "sha256:8d85ebe50aa67809ef97063cb7f0ffeee2e530d7cd1053ad4b6380da99d5f5c7",
+      "origin": "synced"
     }
   ]
 }
