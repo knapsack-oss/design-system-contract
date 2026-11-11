@@ -21,6 +21,11 @@
       "path": "card.contract.json",
       "address": "sha256:77d695b9098bf57a3f36a44a3474dd6aaf4db2a360beff3123ce943b30c7ed48",
       "origin": "synced"
+    },
+    {
+      "path": "dialog.contract.json",
+      "address": "sha256:8d85ebe50aa67809ef97063cb7f0ffeee2e530d7cd1053ad4b6380da99d5f5c7",
+      "origin": "synced"
     }
   ]
 }

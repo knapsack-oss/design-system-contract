@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://knapsack-oss.github.io/design-system-contract/schemas/v0.2/component.contract.schema.json",
   "title": "Design System Contract: component contract",
-  "description": "One JSON document describing the governed interface of exactly one component: identity, display name, typed props, slots, and states. Licensed Apache-2.0.",
+  "description": "One JSON document describing the governed interface of exactly one component: identity, display name, typed props, slots, states, and events. Licensed Apache-2.0.",
   "type": "object",
   "required": ["contractId", "component"],
   "additionalProperties": false,
@@ -53,6 +53,12 @@
       "description": "Named conditions the component can be in. Optional. How a publisher obtains state names is not specified.",
       "type": "array",
       "items": { "type": "string", "minLength": 1 }
+    },
+    "events": {
+      "description": "Events and callbacks the component emits, named the way usage code writes them, for example onClick, click, or update:modelValue. Optional: absent means none are declared. Signatures are left to the source language's compiler. A name is not also a prop; a publisher checks this at publish.",
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/event" }
     }
   },
   "$defs": {
@@ -119,8 +125,9 @@
       "additionalProperties": false,
       "properties": {
         "properties": {
-          "description": "Map from prop name to that prop's schema.",
+          "description": "Map from prop name to that prop's schema. A prop name is not empty.",
           "type": "object",
+          "propertyNames": { "minLength": 1 },
           "additionalProperties": { "$ref": "#/$defs/prop" }
         },
         "required": {
@@ -136,10 +143,19 @@
       }
     },
     "prop": {
-      "description": "One prop's schema. type is required. If both enum and default are present, default must be one of the enum values; a publisher checks this at publish.",
+      "description": "One prop's schema. type is required. default and every enum value must fit type, which allOf checks. If both enum and default are present, default must be one of the enum values; a publisher checks this at publish.",
       "type": "object",
       "required": ["type"],
       "additionalProperties": false,
+      "allOf": [
+        { "if": { "properties": { "type": { "anyOf": [{ "const": "string" }, { "type": "array", "contains": { "const": "string" } }] } } }, "else": { "properties": { "default": { "not": { "type": "string" } }, "enum": { "type": "array", "items": { "not": { "type": "string" } } } } } },
+        { "if": { "properties": { "type": { "anyOf": [{ "const": "boolean" }, { "type": "array", "contains": { "const": "boolean" } }] } } }, "else": { "properties": { "default": { "not": { "type": "boolean" } }, "enum": { "type": "array", "items": { "not": { "type": "boolean" } } } } } },
+        { "if": { "properties": { "type": { "anyOf": [{ "const": "array" }, { "type": "array", "contains": { "const": "array" } }] } } }, "else": { "properties": { "default": { "not": { "type": "array" } }, "enum": { "type": "array", "items": { "not": { "type": "array" } } } } } },
+        { "if": { "properties": { "type": { "anyOf": [{ "const": "object" }, { "type": "array", "contains": { "const": "object" } }] } } }, "else": { "properties": { "default": { "not": { "type": "object" } }, "enum": { "type": "array", "items": { "not": { "type": "object" } } } } } },
+        { "if": { "properties": { "type": { "anyOf": [{ "const": "null" }, { "type": "array", "contains": { "const": "null" } }] } } }, "else": { "properties": { "default": { "not": { "type": "null" } }, "enum": { "type": "array", "items": { "not": { "type": "null" } } } } } },
+        { "if": { "properties": { "type": { "anyOf": [{ "const": "number" }, { "type": "array", "contains": { "const": "number" }  }, { "const": "integer" }, { "type": "array", "contains": { "const": "integer" } }] } } }, "else": { "properties": { "default": { "not": { "type": "number" } }, "enum": { "type": "array", "items": { "not": { "type": "number" } } } } } },
+        { "if": { "properties": { "type": { "anyOf": [{ "const": "number" }, { "type": "array", "contains": { "const": "number" } }] } } }, "else": { "properties": { "default": { "anyOf": [{ "not": { "type": "number" }  }, { "type": "integer" }] }, "enum": { "type": "array", "items": { "anyOf": [{ "not": { "type": "number" }  }, { "type": "integer" }] } } } } }
+      ],
       "properties": {
         "type": {
           "description": "A JSON Schema 2020-12 type name, or an array of them.",
@@ -162,7 +178,9 @@
         },
         "enum": {
           "description": "The allowed values. A prop carrying enum is a variant axis.",
-          "type": "array"
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true
         },
         "deprecated": {
           "description": "JSON Schema 2020-12's own deprecated annotation, carried as-is: true means a usage should stop supplying this prop. Say why or what replaces it in description.",
@@ -172,6 +190,26 @@
     },
     "typeName": {
       "enum": ["string", "number", "integer", "boolean", "array", "object", "null"]
+    },
+    "event": {
+      "description": "An event, as a bare name or a record.",
+      "oneOf": [
+        { "type": "string", "minLength": 1 },
+        { "$ref": "#/$defs/eventRecord" }
+      ]
+    },
+    "eventRecord": {
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "description": { "type": "string" },
+        "deprecated": {
+          "description": "true means a usage should stop handling this event, as on a prop. Say why or what replaces it in description.",
+          "type": "boolean"
+        }
+      }
     },
     "slot": {
       "description": "A slot, as a bare name or a record.",
