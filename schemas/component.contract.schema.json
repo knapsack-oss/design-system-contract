@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://knapsack-oss.github.io/design-system-contract/schemas/v0.2/component.contract.schema.json",
   "title": "Design System Contract: component contract",
-  "description": "One JSON document describing the governed interface of exactly one component: identity, display name, typed props, slots, and states. Licensed Apache-2.0.",
+  "description": "One JSON document describing the governed interface of exactly one component: identity, display name, typed props, slots, states, and events. Licensed Apache-2.0.",
   "type": "object",
   "required": ["contractId", "component"],
   "additionalProperties": false,
@@ -53,6 +53,12 @@
       "description": "Named conditions the component can be in. Optional. How a publisher obtains state names is not specified.",
       "type": "array",
       "items": { "type": "string", "minLength": 1 }
+    },
+    "events": {
+      "description": "Events and callbacks the component emits, named the way usage code writes them, for example onClick, click, or update:modelValue. Optional: absent means none are declared. Signatures are left to the source language's compiler. A name is not also a prop; a publisher checks this at publish.",
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/event" }
     }
   },
   "$defs": {
@@ -184,6 +190,26 @@
     },
     "typeName": {
       "enum": ["string", "number", "integer", "boolean", "array", "object", "null"]
+    },
+    "event": {
+      "description": "An event, as a bare name or a record.",
+      "oneOf": [
+        { "type": "string", "minLength": 1 },
+        { "$ref": "#/$defs/eventRecord" }
+      ]
+    },
+    "eventRecord": {
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "description": { "type": "string" },
+        "deprecated": {
+          "description": "true means a usage should stop handling this event, as on a prop. Say why or what replaces it in description.",
+          "type": "boolean"
+        }
+      }
     },
     "slot": {
       "description": "A slot, as a bare name or a record.",

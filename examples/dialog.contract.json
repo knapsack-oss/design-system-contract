@@ -1,0 +1,17 @@
+{
+  "$schema": "https://knapsack-oss.github.io/design-system-contract/schemas/v0.2/component.contract.schema.json",
+  "contractId": "dialog",
+  "component": "Dialog",
+  "description": "A modal window for one focused task.",
+  "props": {
+    "properties": {
+      "open": { "type": "boolean", "default": false, "description": "Whether the dialog is showing" }
+    },
+    "additionalProperties": false
+  },
+  "slots": [{ "name": "body", "minChildren": 1 }],
+  "events": [
+    { "name": "onOpenChange", "description": "Fires when the dialog opens or closes." },
+    { "name": "onDismiss", "deprecated": true, "description": "Use onOpenChange instead." }
+  ]
+}
