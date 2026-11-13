@@ -1,0 +1,41 @@
+{
+  "description": "Conformance fixtures for the fold (spec/spec.md, section \"The fold\"). Any implementation of the fold should produce these results.",
+  "folds": [
+    { "name": "Button_Primary", "id": "button-primary", "source": "SCN-014" },
+    { "name": "Button Primary", "id": "button-primary", "source": "SCN-014" },
+    { "name": "iconBadge", "id": "iconbadge", "source": "SCN-014" },
+    { "name": "ICON", "id": "icon", "source": "SCN-014" },
+    { "name": "forms/Button", "id": "forms-button", "source": "SCN-014" },
+    { "name": "Button--primary", "id": "button-primary", "source": "SCN-014" },
+    { "name": "card-_header", "id": "card-header", "source": "SCN-014" },
+    { "name": "Button.Primary", "id": "button-primary", "source": "SCN-014" },
+    { "name": "-Button-", "id": "button", "source": "step 4" },
+    { "name": " ._/Button/_. ", "id": "button", "source": "steps 2 and 4" },
+    { "name": "Button2", "id": "button2", "source": "digits are kept" }
+  ],
+  "rejections": [
+    { "name": "Café", "reason": "carries residual character", "residual": ["é"], "source": "SCN-015" },
+    { "name": "Café", "reason": "carries residual character", "residual": ["́"], "source": "no Unicode normalization" },
+    { "name": "Kelvin", "reason": "carries residual character", "residual": ["K"], "source": "ASCII lowercase only: U+212A KELVIN SIGN is not k" },
+    { "name": "İcon", "reason": "carries residual character", "residual": ["İ"], "source": "ASCII lowercase only: no locale case mapping" },
+    { "name": "Button\tPrimary", "reason": "carries residual character", "residual": ["\t"], "source": "tab is outside the separator class" },
+    { "name": "Button Primary", "reason": "carries residual character", "residual": [" "], "source": "no-break space is outside the separator class" },
+    { "name": "___", "reason": "empty after fold", "source": "SCN-015" },
+    { "name": "/", "reason": "empty after fold", "source": "SCN-015" },
+    { "name": " ", "reason": "empty after fold", "source": "SCN-015" },
+    { "name": "---", "reason": "empty after fold", "source": "step 4" },
+    { "name": "", "reason": "empty after fold", "source": "nothing to fold" }
+  ],
+  "publish": {
+    "source": "SCN-015",
+    "names": ["Café", "___", "Button Primary", "button_primary", "Button--Primary", "Card"],
+    "ids": { "Card": "card" },
+    "rejections": [
+      { "name": "Café", "reason": "carries residual character", "residual": ["é"] },
+      { "name": "___", "reason": "empty after fold" }
+    ],
+    "collisions": [
+      { "id": "button-primary", "names": ["Button Primary", "button_primary", "Button--Primary"] }
+    ]
+  }
+}

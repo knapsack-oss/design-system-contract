@@ -10,14 +10,14 @@ is one file per component, saying which props exist, what type each one is, whic
 and what the defaults are. A manifest lists the component files. Any tool can read the files, and
 any JSON Schema validator can check them.
 
-**Status: v0.1.** Two formats (the component contract and the manifest) and their JSON Schemas.
+**Status: v0.2 (draft).** Two formats (the component contract and the manifest) and their JSON Schemas.
 Licensed [Apache-2.0](LICENSE).
 
 ## A component contract
 
 ```json
 {
-  "$schema": "https://knapsack-oss.github.io/design-system-contract/schemas/v0/component.contract.schema.json",
+  "$schema": "https://knapsack-oss.github.io/design-system-contract/schemas/v0.2/component.contract.schema.json",
   "contractId": "button-primary",
   "component": "Button Primary",
   "description": "The primary call-to-action button.",
@@ -39,12 +39,25 @@ Licensed [Apache-2.0](LICENSE).
   the component, by a fixed rule (below).
 - **`component`** is the design system's own display name, kept exactly as written.
 - **`props`** is itself a JSON Schema, so a tool can check a usage's props against it directly.
-  Each prop has a `type` and may have a `default`, a `description`, and an `enum` of allowed values.
-  `additionalProperties` says whether props not listed are allowed. A component with no `props`
-  member takes no props.
+  Each prop has a `type` that its other values must fit, and may have a `default`, a `description`, and an `enum` of allowed values.
+  `additionalProperties` says whether props not listed are allowed. Closed (`false`) is the expected
+  value; open (`true`) is a deviation worth explaining in the contract's `description`. A component
+  with no `props` member takes no props.
 - **Variants are enum props.** There is no separate variants block. A prop named `variant` with an
   `enum` is a variant axis, and so is `size`, `tone`, or anything else with an `enum`.
-- **`slots`** and **`states`** are optional.
+- **`slots`** and **`states`** are optional. A slot record can also state what fills it: `minChildren`
+  (1 makes it required), `maxChildren` (1 means only one), `accepts` (the `contractId`s of the only
+  components allowed), and `allowsText`.
+- **`deprecated: true`** on a prop (JSON Schema's own keyword) marks a prop that still works but
+  shouldn't be used in new code. Say what replaces it in the prop's `description`. Whether a whole
+  component is deprecated is recorded in its DSDS entry, not in the contract.
+- **`exports`** (optional) says how code refers to the component, one record per way:
+  `{ "kind": "js", "name": "Button", "specifier": "@acme/ui" }`, a custom element
+  `tagName`, or an Angular `selector`. A tool matches a usage in product code against these
+  exactly, so it finds the right contract whatever the display name is.
+- **`events`** (optional) names what the component emits, the way usage code writes it: `onClick`,
+  `click`, `update:modelValue`. A declared event isn't an undeclared prop. Signatures stay with your
+  compiler, so the contract never restates them.
 - **`cemRef`** and **`shadcnRef`** (optional) point at the same component's entry in a
   [Custom Elements Manifest](https://github.com/webcomponents/custom-elements-manifest) or a
   [shadcn registry](https://ui.shadcn.com). They are identifiers only; the contract doesn't copy
@@ -74,20 +87,20 @@ Nothing is silently merged. The rule gives the same answer on every machine, in 
 
 ```json
 {
-  "$schema": "https://knapsack-oss.github.io/design-system-contract/schemas/v0/manifest.schema.json",
+  "$schema": "https://knapsack-oss.github.io/design-system-contract/schemas/v0.2/manifest.schema.json",
   "contractVersion": "0.1.0",
   "artifacts": [
     {
       "path": "button-primary.contract.json",
-      "address": "sha256:b11ac43d1cf8120534e96ec2d90c24a4c2d9b20364fe01e27632ee7ad63b7dd4",
+      "address": "sha256:be9e9a531041e4b830a099d087aaf3cd6093c99e65b0a4385ca1013933ab0606",
       "origin": "synced"
     }
   ]
 }
 ```
 
-Each record gives a contract's location relative to the manifest, its content address, and where it
-came from: `synced` from the design system's source of truth, or `inferred` without the owner's
+Each record gives a contract's location inside the manifest's own directory (never `..`, an absolute
+path, or a URL), its content address, and where it came from: `synced` from the design system's source of truth, or `inferred` without the owner's
 confirmation. The address is `sha256:` plus the SHA-256 digest of the contract serialized per
 [RFC 8785](https://www.rfc-editor.org/rfc/rfc8785) (JSON Canonicalization Scheme), so reformatting
 a file doesn't change its address. Editing its content does.
@@ -130,10 +143,10 @@ npm test
 | [`spec/constitution.md`](spec/constitution.md) | The principles every change to the format must respect |
 | [`schemas/`](schemas) | JSON Schemas for the component contract and the manifest. Where prose and a schema disagree, the schema is correct. |
 | [`examples/`](examples) | A valid contract and manifest |
-| [`test/`](test) | Checks the schemas and examples against the specification |
+| [`test/`](test) | Checks the schemas and examples against the specification. [`test/fixtures/fold.json`](test/fixtures/fold.json) holds `contractId` cases any implementation can run. |
 | [`docs/future-directions.md`](docs/future-directions.md) | What v0.1 deliberately leaves out |
 
-## Not in v0.1
+## Not in this version
 
 Design tokens, strictness rules per destination, an agent-facing index, provenance and signing, and
 a checker tool are all out of scope for this version. [Future directions](docs/future-directions.md)
@@ -141,22 +154,17 @@ says what each would add. None of it is a commitment.
 
 ## Known limitations
 
-These are gaps in what v0.1 *does* cover. Each one is a candidate for a patch or minor release, and
+These are gaps in what this version *does* cover. Each one is a candidate for a patch or minor release, and
 each will be settled through the specification's change process rather than by the schema quietly
 changing.
 
 - **Some publish-time checks live only in the specification.** The spec says a publisher must fail
   when `required` names an undeclared prop, a `default` isn't one of its `enum` values, a name folds
-  to nothing, or two names fold to the same `contractId`. JSON Schema can't express these, and v0.1
+  to nothing, two names fold to the same `contractId`, a slot's `minChildren` exceeds its
+  `maxChildren`, `accepts` names a `contractId` the manifest doesn't have, or a name is both a prop
+  and an event. JSON Schema can't express these, and v0.1
   ships no tool that runs them. A schema validator alone won't catch them.
-- **The `contractId` fold has no executable test.** Its worked examples are in the specification,
-  but nothing in `test/` runs them.
-- **`enum` can be empty.** The schema accepts `"enum": []`, which describes a prop with no allowed
-  values.
-- **Prop names are unconstrained.** Any key is accepted under `props.properties`, including `""`.
 - **`contractVersion` is free text.** It must be non-empty but doesn't have to be a semantic version.
-- **`slots[].a11y.required` has no defined meaning yet.** It's a boolean in the schema, but the
-  specification doesn't say what it requires.
 - **The DSDS trait mapping has uncovered cases.** A name used as both a prop and a state (as
   `disabled` is in the example), a boolean prop that also carries `enum`, and a `type` array that
   includes `boolean` each have no single mapping.

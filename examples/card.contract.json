@@ -1,0 +1,17 @@
+{
+  "$schema": "https://knapsack-oss.github.io/design-system-contract/schemas/v0.2/component.contract.schema.json",
+  "contractId": "card",
+  "component": "Card",
+  "description": "A container for one piece of content and its actions.",
+  "props": {
+    "properties": {
+      "tone": { "type": "string", "enum": ["neutral", "brand"], "default": "neutral" }
+    },
+    "additionalProperties": false
+  },
+  "slots": [
+    { "name": "media", "maxChildren": 1, "allowsText": false },
+    { "name": "body", "minChildren": 1 },
+    { "name": "actions", "maxChildren": 2, "accepts": ["button-primary"], "allowsText": false }
+  ]
+}
