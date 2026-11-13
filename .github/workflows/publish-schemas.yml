@@ -1,0 +1,75 @@
+# Publishes schemas/ to the site (the gh-pages branch) when a release is tagged,
+# at the path each schema's $id names, then checks the live URLs serve the
+# tagged bytes. Without this the $schema URL in the README is a 404 until
+# someone copies the files by hand.
+name: Publish schemas
+
+on:
+  push:
+    tags: ['v[0-9]+.[0-9]+.[0-9]+']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag to publish (e.g. v0.2.0)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-schemas
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      TAG: ${{ inputs.tag || github.ref_name }}
+    steps:
+      - name: Check out the tagged release
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ env.TAG }}
+
+      - name: Check out the site
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: gh-pages
+          path: _site
+
+      - name: Copy schemas to the path their $id names
+        id: copy
+        run: |
+          result="$(scripts/publish-schemas.sh "$TAG" _site)"
+          echo "$result"
+          echo "status=${result%% *}" >> "$GITHUB_OUTPUT"
+          echo "dir=${result#* }" >> "$GITHUB_OUTPUT"
+
+      - name: Commit and push the site
+        if: steps.copy.outputs.status == 'published'
+        working-directory: _site
+        env:
+          DIR: ${{ steps.copy.outputs.dir }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$DIR"
+          git commit -m "Publish $DIR from $TAG"
+          git push origin HEAD:gh-pages
+
+      - name: Check the live URLs serve the tagged bytes
+        env:
+          DIR: ${{ steps.copy.outputs.dir }}
+        run: |
+          for f in schemas/*.schema.json; do
+            url="https://knapsack-oss.github.io/design-system-contract/$DIR/$(basename "$f")"
+            for attempt in $(seq 1 30); do
+              if curl -fsS "$url" -o /tmp/live.json && cmp -s "$f" /tmp/live.json; then
+                echo "ok $url"; continue 2
+              fi
+              sleep 10
+            done
+            echo "::error::$url does not serve the bytes of $f at $TAG after 5 minutes"
+            exit 1
+          done
