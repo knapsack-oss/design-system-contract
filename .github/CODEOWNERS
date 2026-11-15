@@ -1,0 +1,18 @@
+# Who must review a change. The last matching line wins.
+#
+# Maintainers own the format: the spec, the schemas, the examples and the tests.
+# Platform owns what runs on its own: workflows, release scripts and dependencies.
+# Names are listed one by one until the knapsack-oss organization has teams.
+
+# Maintainers
+*                     @sxalexander @chrisstrahl @shinytoyrobots @illepic
+
+# Platform
+/.github/             @sxalexander @chrisstrahl @shinytoyrobots @illepic @freneticpixel
+/scripts/             @sxalexander @chrisstrahl @shinytoyrobots @illepic @freneticpixel
+/package.json         @sxalexander @chrisstrahl @shinytoyrobots @illepic @freneticpixel
+/package-lock.json    @sxalexander @chrisstrahl @shinytoyrobots @illepic @freneticpixel
+/renovate.json        @sxalexander @chrisstrahl @shinytoyrobots @illepic @freneticpixel
+
+# Changing who owns what is a maintainer decision.
+/.github/CODEOWNERS   @sxalexander @chrisstrahl @shinytoyrobots @illepic
