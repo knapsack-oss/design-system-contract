@@ -5,14 +5,14 @@
 # Names are listed one by one until the knapsack-oss organization has teams.
 
 # Maintainers
-*                     @sxalexander @chrisstrahl
+*                     @sxalexander @chrisstrahl @shinytoyrobots @illepic
 
 # Platform
-/.github/             @sxalexander @chrisstrahl @freneticpixel
-/scripts/             @sxalexander @chrisstrahl @freneticpixel
-/package.json         @sxalexander @chrisstrahl @freneticpixel
-/package-lock.json    @sxalexander @chrisstrahl @freneticpixel
-/renovate.json        @sxalexander @chrisstrahl @freneticpixel
+/.github/             @sxalexander @chrisstrahl @shinytoyrobots @illepic @freneticpixel
+/scripts/             @sxalexander @chrisstrahl @shinytoyrobots @illepic @freneticpixel
+/package.json         @sxalexander @chrisstrahl @shinytoyrobots @illepic @freneticpixel
+/package-lock.json    @sxalexander @chrisstrahl @shinytoyrobots @illepic @freneticpixel
+/renovate.json        @sxalexander @chrisstrahl @shinytoyrobots @illepic @freneticpixel
 
 # Changing who owns what is a maintainer decision.
-/.github/CODEOWNERS   @sxalexander @chrisstrahl
+/.github/CODEOWNERS   @sxalexander @chrisstrahl @shinytoyrobots @illepic
