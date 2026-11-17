@@ -1,22 +1,20 @@
 # Constitution — Design System Contract
 
-**Version:** 5.0.0 · **Ratified:** 2026-07-29 · **Last amended:** 2026-09-24 · **Amendment:** public-reader-change-control
+**Version:** 6.0.0 · **Ratified:** 2026-07-29 · **Last amended:** 2026-11-17 · **Amendment:** editorial-history
 
 This file outranks defaults in every process that produces or changes the specification. Where it is
 silent, defaults apply. Where it speaks, it wins.
 
 **Product frame.** An open **Design System Contract** format, licensed Apache-2.0, that expresses a
 design system's components as machine-readable contracts: one JSON file per component plus a
-manifest that lists them. Version 0.1 is the format only. Tooling that syncs, verifies, or scores
-against the format, and any hosted verification or attestation service, are separate concerns. The
-posture is open spec, commercial implementation: adoption of the format is the goal; capture of the
-format is not.
+manifest that lists them. Version 0.1 is the format only. Tooling built on the format is a separate
+concern. The posture is open spec, commercial implementation: adoption of the format is the goal;
+capture of the format is not.
 
 **Standing rulings.** Two rulings predate this file and bind it: the format is open, licensed
-Apache-2.0, and written as if public from day one, with commercial value living only in services
-built on it; and evaluation layers are designed independently, never depending on an external eval
-suite. Where this constitution conflicts with either ruling, the conflict goes to the maintainers
-rather than being silently resolved.
+Apache-2.0, and written as if public from day one; and evaluation layers are designed
+independently, never depending on an external eval suite. Where this constitution conflicts with
+either ruling, the conflict goes to the maintainers rather than being silently resolved.
 
 ---
 
@@ -71,7 +69,7 @@ is a finding.
 - **Prefer mechanical checks first, judgment later.** A property that cannot be expressed as a
   deterministic check is stated as such, not approximated inside a checker.
 - **Prefer visible human sign-off over silent automation** on anything that produces an
-  attestation or a score a customer will quote.
+  attestation or a score.
 - **American English throughout** — spec text, schema descriptions, and generated artifacts.
 
 ---
@@ -80,7 +78,7 @@ is a finding.
 
 - This constitution may be amended through the spec-change process. Amendments are always a
   **major** increment, regardless of textual size, and always require a maintainer decision. The process
-  refuses to soften a prohibition or an escalation trigger without explicit direction from the
+  refuses to soften a prohibition or a change-control item without explicit direction from the
   maintainers.
 - Work that would violate this constitution **halts** and surfaces the conflict. It does not
   proceed under protest, does not downgrade the violation to a finding, and does not route around
@@ -111,42 +109,8 @@ Suppressing one of these is a violation; raising one is not a failure.
 
 ## Amendment history
 
-**v5.0.0 — 2026-09-24.** Public-reader trim for the v0.1 release. **Changed:** the rulings of record
-are stated by content rather than by internal document name, and escalate to the maintainers; the
-violation policy's "human owner" becomes the maintainers. **Replaced:** the internal effort
-machinery section (escalation triggers routed to internal review roles, dispatch overrides, budgets
-and weight class) with a Change control section. ESC-D1, ESC-D2, ESC-D3, ESC-D4, ESC-E1, ESC-E2, and
-ESC-E5 carry over as CC-1 to CC-6 (D2 and D3 merged into CC-3), each now requiring a maintainer
-decision. **Removed:** ESC-D5 (eval-mapping acknowledgment) and the internal-only ESC-E3, E4, E6, E7,
-dispatch overrides, and budgets, which bound only the internal process that produced the
-specification. **Not softened:** no prohibition changed; every carried-over trigger still requires a
-human decision.
+**v6.0.0, 2026-11-17.** Editorial: the product frame, the standing rulings, and one preference are
+reworded more briefly; the violation policy names change-control items; this history lists public
+versions only. No prohibition or change-control item changed.
 
-**v4.0.0 — 2026-09-24.** Public-release trim and schema ground truth, companion to spec 0.10.0
-(D-70 – D-80). **Changed:** the product frame now describes the format-only v0.1 and drops the
-tooling wedge and the internal-format lineage; PROH-2 re-anchored from a deferred command's verify
-path to every mechanical check the specification names; PROH-3 marked dormant in v0.1 and binding
-on any version that carries tokens; PROH-4's prior-art list drops the internal format and the
-generic-plugin clause (the latter survives as ESC-E7, marked internal); **PROH-5 re-anchored** from
-"no silent divergence from an internal schema" to "the published schema is the ground truth", with
-decision entries in the spec replacing the internal decision log as the record of change (D-74);
-Preferences drop the internal-format name, the envelope reference, and the TypeScript house rules;
-ESC-E2 drops the CLI and MCP surfaces and keeps contract members; ESC-E3, E4, E6, E7 marked internal
-effort only; ESC-E5's list drops the internal format; Budgets compressed to the ratified figures
-with the calibration narrative archived. **Removed:** the Narrator context section in full
-(stakeholder names, a chat-canvas identifier, and the four-track validation plan — internal
-material not for a public reader); every file path into a private knowledge base or another
-repository; every reference to the internal brief and its decision log. Rulings of record are now
-referenced by name, not path. **Not softened:** every prohibition is at least as strong as in
-v3.0.0 — PROH-2 now binds more checks, not fewer; PROH-5 binds against a published artifact anyone
-can verify rather than an internal one. Human-approved under ESC-D1 on 2026-09-24 as part of the
-v0.1 release docket.
-
-**v3.0.0 — 2026-07-30.** License alignment: PROH-1 pinned to Apache-2.0 per the spec-openness
-policy ruling of record; rulings-of-record paragraph added. A tightening, not a softening.
-
-**v2.0.0 — 2026-07-30.** Added Budgets and weight class, ratifying figures the first two
-generations had run on informally. No prohibition, trigger, or preference changed.
-
-**v1.0.0 — 2026-07-29.** Initial ratification: five prohibitions, nine soft preferences, twelve
-escalation triggers, no dispatch overrides.
+**v5.0.0, 2026-09-24.** Prepared for public release. No prohibition changed.

@@ -2,9 +2,6 @@
 version: "0.12.0"
 status: draft
 last-amended: "2026-11-06"
-amendments-pending: 0
-mapping-pending: true
-effort: contract-spec-wedge
 ---
 
 # Specification — Design System Contract (format, v0.2 draft)
@@ -23,8 +20,8 @@ exposes. Anyone may implement the format; no vendor relationship is required.
 This version specifies the **format only**: two artifact classes, their JSON
 Schemas, the rule that turns a declared component name into a stable identifier,
 and the documented way a [DSDS](https://designsystemdocspec.org) component entry
-points at a contract. Tooling that syncs, verifies, or scores against the format
-is a separate concern and is listed under Future directions, not specified here.
+points at a contract. Tooling built on the format is a separate concern and is
+listed under Future directions, not specified here.
 
 ## Scope
 
@@ -94,7 +91,6 @@ does not declare fails validation at that member
   from this repository is required.
 
 **Derived requirements:** SR-121, SR-122, SR-123, SR-103, SR-104
-**Covered by:** mapping-pending (evals re-bound by `flow-eval` after release)
 
 ### SCN-011: Publisher declares typed props with required, default, and enum
 
@@ -140,7 +136,6 @@ whether it is required, its default, and its allowed values
 - A prop may be named `variant`; there is no separate `variants` member (D-73).
 
 **Derived requirements:** SR-124, SR-125, SR-126, SR-127, SR-128
-**Covered by:** mapping-pending
 
 ### SCN-012: Contract with no props declares an empty, closed set
 
@@ -162,7 +157,6 @@ an empty prop set that is closed
 - `props: { "additionalProperties": true }` is read as zero declared props, open.
 
 **Derived requirements:** SR-048
-**Covered by:** mapping-pending
 
 ### SCN-013: Publisher declares slots and states, or leaves them out
 
@@ -184,7 +178,6 @@ accessible name, and `hover` and `disabled` states
   state names (D-72).
 
 **Derived requirements:** SR-129
-**Covered by:** mapping-pending
 
 ### SCN-014: Declared name folds to a DSDS-valid `contractId`
 
@@ -206,7 +199,6 @@ valid DSDS component `id`
   DSDS `id` pattern `^[a-z0-9]+(-[a-z0-9]+)*(\.[a-z0-9]+(-[a-z0-9]+)*)*$`.
 
 **Derived requirements:** SR-130, SR-122
-**Covered by:** mapping-pending
 
 ### SCN-015: Fold rejects unusable names and refuses to merge collisions
 
@@ -237,7 +229,6 @@ as empty after fold, the three remaining names are reported as one collision on
   partial manifest.
 
 **Derived requirements:** SR-131, SR-132, SR-133
-**Covered by:** mapping-pending
 
 ### SCN-016: Publisher writes a manifest that lists component contracts
 
@@ -278,7 +269,6 @@ integrity-checked from the manifest alone
 - The manifest never lists itself.
 
 **Derived requirements:** SR-134, SR-135, SR-006, SR-136, SR-137, SR-133
-**Covered by:** mapping-pending
 
 ### SCN-017: DSDS component entry points at a contract
 
@@ -301,7 +291,6 @@ following `href` reaches a contract whose `contractId` equals the entry's `id`
   is permitted but discouraged (SHOULD, D-79).
 
 **Derived requirements:** SR-138
-**Covered by:** mapping-pending
 
 ### SCN-018: Consumer projects a contract onto DSDS traits
 
@@ -323,7 +312,6 @@ following `href` reaches a contract whose `contractId` equals the entry's `id`
 - `label` (string, no enum) → no trait; DSDS traits carry no free-form props.
 
 **Derived requirements:** SR-139, SR-140, SR-141
-**Covered by:** mapping-pending
 
 ### SCN-019: Publisher marks a prop as deprecated
 
@@ -382,7 +370,6 @@ exact key, with no guessing from names:
 - Two contracts in one manifest carrying the same key fail the publish.
 
 **Derived requirements:** SR-147, SR-148, SR-149, SR-150, SR-151
-**Covered by:** mapping-pending
 
 ### SCN-021: A consumer picks the schema a document names
 
@@ -434,7 +421,6 @@ consulting any other file
 - A bare slot name states no rule.
 
 **Derived requirements:** SR-129, SR-155, SR-156, SR-157
-**Covered by:** mapping-pending
 
 ### SCN-023: A manifest cannot point outside its own directory
 
@@ -453,7 +439,6 @@ the manifest reads outside the manifest's directory or reaches the network
   a directory literally called `%2e%2e`.
 
 **Derived requirements:** SR-158, SR-159
-**Covered by:** mapping-pending
 
 ### SCN-024: A prop's values must fit its type
 
@@ -473,7 +458,6 @@ the manifest reads outside the manifest's directory or reaches the network
   (SR-127): a stock schema cannot compare one value against another.
 
 **Derived requirements:** SR-160
-**Covered by:** mapping-pending
 
 ### SCN-025: Publisher names the events a component emits
 
@@ -499,7 +483,6 @@ and an undeclared handler such as `onClik` is still flagged
 - An event has no DSDS trait.
 
 **Derived requirements:** SR-161, SR-162, SR-163
-**Covered by:** mapping-pending
 
 ---
 
@@ -649,11 +632,9 @@ tagged in the trailing comment.
 
 ## Invariants
 
-Statements that must hold across all valid implementations. Each requires a
-dedicated grader, a real + adversarial dataset pair, and threshold 1.0
-(mapping-pending in this version).
+Statements that must hold across all valid implementations.
 
-- **INV-1**: No model inference call occurs in any mechanical check against this format. Mechanical checks are deterministic; judgment belongs elsewhere.   *amended v0.10.0 — re-anchored from the deferred CLI's verify path to mechanical checks generally (D-70, D-74)*
+- **INV-1**: No model inference call occurs in any mechanical check against this format. Mechanical checks are deterministic; judgment belongs elsewhere.   *amended v0.10.0: re-anchored to mechanical checks generally (D-70, D-74)*
 - **INV-3**: The Design System Contract format is never framed as proprietary IP. The specification and its JSON Schemas remain permissively licensed and freely redistributable.   *unchanged*
 - **INV-4**: The contract composes with DTCG, DSDS, CEM, the shadcn registry, and AGENTS.md; it never replaces, forks, or shadows their constructs.   *unchanged*
 - **INV-5**: No artifact is treated as valid whose content address does not equal the `sha256` of its canonical form. Any mismatch is a hard failure, never a warning.   *amended v0.10.0 — derivation parenthetical removed (D-74)*
@@ -666,9 +647,7 @@ reused. INV IDs are not renumbered. No invariant text changed in v0.11.0.
 
 ## Conformance tests
 
-The eval suite is not part of the public release. Every scenario, requirement,
-and invariant in this version is `mapping-pending`; `flow-eval` re-binds them to
-graders and datasets after release. Mechanical acceptance criteria above are
+Conformance fixtures live in `test/`. Mechanical acceptance criteria above are
 written so that each becomes one fixture: a document plus an expected
 validate/reject or fold/reject result.
 
@@ -823,18 +802,18 @@ whose local tags a scanner resolves back to the `js` record.
 
 ## Resolved decisions
 
-Earlier drafts and their decisions were internal; the public record starts at
-v0.10.0 with D-70.
+This record starts at v0.10.0 with D-70; decisions from earlier drafts are not
+carried here.
 
 ### D-70 – D-80 — the v0.1 release docket (2026-09-24)
 
-All eleven were ruled by Robin on 2026-09-24 for the public v0.1 release.
+All eleven were ruled by the maintainers on 2026-09-24 for the public v0.1 release.
 
 - **D-70 — v0.1 artifact set is manifest plus component contracts.** *What:*
   two artifact classes. DTCG tokens, tolerance envelopes, the agent index,
-  the provenance log, signing, the command-line tool (`init` / `sync` /
-  `verify` / `score`), and the CI action are deferred and recorded under Future
-  directions as directions, not requirements. SCN-001 – SCN-009 and every SR
+  the provenance log, signing, command-line tooling, and CI integration are
+  deferred and recorded under Future directions as directions, not
+  requirements. SCN-001 – SCN-009 and every SR
   that served only the deferred surfaces are removed and their identifiers
   retired, never reused; INV-2 is removed with tokens. *Why:* the release is a
   format other parties can adopt; the tooling depends on artifacts that are cut,
@@ -848,7 +827,7 @@ All eleven were ruled by Robin on 2026-09-24 for the public v0.1 release.
   whenever `props` is present, `props.additionalProperties` is a required
   boolean; a contract that omits `props` entirely declares an empty, closed
   set, and the schema does not require `props` (SR-048, SR-124). This
-  supersedes the earlier internal rule that an absent flag implied closed.
+  supersedes an earlier draft's rule that an absent flag implied closed.
   *Why:* typed props are what an agent needs to fill a prop bag correctly, and
   JSON Schema is the vocabulary every toolchain already has. An implied-closed
   default would invert JSON Schema's own meaning for an absent
@@ -864,7 +843,7 @@ All eleven were ruled by Robin on 2026-09-24 for the public v0.1 release.
   component's slots without either being non-conforming.
 - **D-73 — no separate `variants` block.** *What:* an enum-typed prop is the
   variant axis; a prop may be named `variant`; the schema declares no
-  `variants` member. An earlier internal record had left open whether
+  `variants` member. An earlier draft had left open whether
   `variants` keys counted as declared props; with one structure there is no
   such question. *Why:* once props carry `enum`, a second enumeration is a second source
   of truth for the same fact; DSDS itself uses a trait named `variant` with no
@@ -872,10 +851,8 @@ All eleven were ruled by Robin on 2026-09-24 for the public v0.1 release.
   cross-prop combination rules have no home until v0.2 (D-80).
 - **D-74 — the published schema is the ground truth.** *What:* where prose and
   schema disagree, the schema is correct; a semantic schema change is recorded
-  as a decision here before it lands. Internal repositories and earlier
-  internal formats are no longer cited in this specification or the
-  constitution; their divergence inventory stays internal. *Why:* a public
-  reader can only be bound by what is published. *Cost:* the derivation
+  as a decision here before it lands. *Why:* a public reader can only be
+  bound by what is published. *Cost:* the derivation
   history of some schema choices is no longer visible from the spec.
 - **D-75 — `contractId` is the sole normative identity; `component` is not
   folded.** *What:* `contractId` = fold(declared name), for example
@@ -935,39 +912,35 @@ All eleven were ruled by Robin on 2026-09-24 for the public v0.1 release.
   `default` becomes a DSDS trait whose first value is read as default, a
   meaning the contract did not assert; the mapping says so.
 
-### D-81 — the 2026-09-24 interpretation-panel amendments
+### D-81: the 2026-09-24 amendments
 
-Three independent readers were run blind over the typed-props and fold slice
-of v0.10.0. They split on one reading and one reader each surfaced two latent
-forks; the operator routed all of them, plus one noted ambiguity, as
-amendments rather than accepting any as an ambiguity. Ruled by Robin on
-2026-09-24; landed in v0.11.0.
+Review of the typed-props and fold slice of v0.10.0 found four ambiguities;
+each was settled as an amendment. Ruled by the maintainers on 2026-09-24;
+landed in v0.11.0.
 
 - **D-81 — collision scope, collect-all reporting, required `type`, non-empty
-  `component`, stable declared name.** *What, four parts.* **(1) P-1, panel
-  split 1–2.** SR-133's "one source" is replaced: `contractId` is unique
-  within a manifest, and collision detection covers every declared name
-  contributing to that manifest whatever its source kind — one reader read
-  "source" as one input file and checked collisions per file, two read it as
-  one publish run; the two-reader reading is ruled, extended to say so in
-  terms of the manifest. Previously published manifests are out of scope. A
-  publish reports every rejection and every collision together, one collision
-  report per identifier naming all N declared names, rather than stopping at
-  the first finding; the same collect-all wording is applied to SR-126 and
-  SR-127 (all three readers had independently chosen collect-all and
-  per-identifier grouping, so this ratifies convergent behavior). Manifest-
-  level uniqueness is SR-133's obligation, cross-referenced from SCN-016; no
+  `component`, stable declared name.** *What, four parts.* **(1) Collision
+  scope.** SR-133's "one source" is replaced: `contractId` is unique within a
+  manifest, and collision detection covers every declared name contributing to
+  that manifest whatever its source kind. "Source" could be read as one input
+  file, with collisions checked per file, or as one publish run; the
+  publish-run reading is ruled, stated in terms of the manifest. Previously
+  published manifests are out of scope. A publish reports every rejection and
+  every collision together, one collision report per identifier naming all N
+  declared names, rather than stopping at the first finding; the same
+  collect-all wording is applied to SR-126 and SR-127. Manifest-level
+  uniqueness is SR-133's obligation, cross-referenced from SCN-016; no
   separate SR is added, because every `contractId` is a fold result (SR-130)
   and SR-133 already fails the publish that would produce a duplicate.
-  **(2) P-2, single reader.** `type` is required in every `props.properties`
-  entry (SR-125); `{}` is not a legal prop schema. Two readers' schemas would
-  have accepted an untyped prop, which contradicts D-71's stated reason for
-  the shape. **(3) P-3, single reader.** `component` is a non-empty string,
-  `minLength: 1` (SR-121). One reader read "verbatim" as licensing the empty
-  string. **(4) Appendix A.** A publisher SHOULD fold the same source
-  identifier for a component on every publish, so `contractId` is stable
-  across publishes; a recommendation, because profiles are v0.2 scope. *Why:*
-  each fork would have produced two conforming implementations that disagree
+  **(2) Required `type`.** `type` is required in every `props.properties`
+  entry (SR-125); `{}` is not a legal prop schema. A schema that accepts an
+  untyped prop contradicts D-71's stated reason for the shape. **(3) Non-empty
+  `component`.** `component` is a non-empty string, `minLength: 1` (SR-121);
+  "verbatim" could otherwise be read as licensing the empty string.
+  **(4) Appendix A.** A publisher SHOULD fold the same source identifier for a
+  component on every publish, so `contractId` is stable across publishes; a
+  recommendation, because profiles are v0.2 scope. *Why:* each ambiguity
+  would have produced two conforming implementations that disagree
   on whether the same input is valid — the exact non-interoperation the format
   exists to prevent — and every fix is a tightening a stock validator or a
   fixture can check. *Cost:* a publisher that merged several source kinds
@@ -1054,7 +1027,7 @@ amendments rather than accepting any as an ambiguity. Ruled by Robin on
 
 ### D-84: how the format versions, and what stays closed
 
-Proposed on 2026-11-06 by Chris Strahl for the maintainer's ruling. The merge
+Proposed on 2026-11-06 for the maintainers' ruling. The merge
 records the ruling.
 
 - **D-84: a schema per format version, no extension members, closed props.**
@@ -1084,7 +1057,7 @@ records the ruling.
 
 ### D-85: slot rules
 
-Proposed on 2026-11-06 by Chris Strahl for the maintainer's ruling. The merge
+Proposed on 2026-11-06 for the maintainers' ruling. The merge
 records the ruling.
 
 - **D-85: a slot can state how many children it takes and what they may be.**
@@ -1116,7 +1089,7 @@ records the ruling.
 
 ### D-86: manifest paths stay inside the manifest's directory
 
-Proposed on 2026-11-06 by Chris Strahl for the maintainer's ruling. The merge
+Proposed on 2026-11-06 for the maintainers' ruling. The merge
 records the ruling.
 
 - **D-86: `path` cannot leave the manifest's directory.** *What:* a schema pattern
@@ -1133,7 +1106,7 @@ records the ruling.
 
 ### D-87: prop values fit their type
 
-Proposed on 2026-11-06 by Chris Strahl for the maintainer's ruling. The merge
+Proposed on 2026-11-06 for the maintainers' ruling. The merge
 records the ruling.
 
 - **D-87: the schema checks `default` and `enum` against `type`.** *What:* seven
@@ -1150,7 +1123,7 @@ records the ruling.
 
 ### D-88: events by name
 
-Proposed on 2026-11-06 by Chris Strahl for the maintainer's ruling. The merge
+Proposed on 2026-11-06 for the maintainers' ruling. The merge
 records the ruling.
 
 - **D-88: a contract names the events a component emits and leaves signatures to
